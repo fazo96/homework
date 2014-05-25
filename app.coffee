@@ -14,7 +14,7 @@ if Meteor.isClient
   }
   Template.adder.events {
     'keypress #newNote': (e,template) ->
-      console.log e.keyCode
       if e.keyCode is 13
         todos.insert { content: template.find('#newNote').value }
+        template.find('#newNote').value = ""
   }
