@@ -1,0 +1,28 @@
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1>Homework <small>management for students</small></h1>
+    </div>
+    <div class="center-block" id="quicknotes">
+      {{> notes}}
+      <div align="center"> {{> adder}} </div>
+    </div>
+  </div>
+</body>
+
+<template name="notes">
+  <ul class="list-group">
+    {{#each notes}}
+    <li class="list-group-item">
+      {{content}}
+      <button type="button" class="btn btn-danger pull-right delete">
+        <i class="fa fa-trash-o"></i>
+      </button>
+    </li>
+    {{/each}}
+  </ul>
+</template>
+
+<template name="adder">
+  <input type="text" id="newNote" class="form-control" placeholder="Add new note">
+</template>

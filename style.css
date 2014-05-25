@@ -1,0 +1,11 @@
+.container {
+  max-width: 700px;
+}
+
+#quicknotes {
+  max-width: 500px;
+}
+
+#newNote {
+  max-width: 250px;
+}
