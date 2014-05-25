@@ -4,8 +4,11 @@
       <h1>Homework <small>management for students</small></h1>
     </div>
     <div class="center-block" id="quicknotes">
-      {{> notes}}
-      <div align="center"> {{> adder}} </div>
+      {{> notes}} {{#if currentUser}}
+      <div align="center">
+        {{> adder}} {{> userInfo}}
+      </div>
+      {{/if}} {{#unless currentUser}} {{> auth}} {{/unless}}
     </div>
   </div>
 </body>
@@ -25,4 +28,19 @@
 
 <template name="adder">
   <input type="text" id="newNote" class="form-control" placeholder="Add new note">
+</template>
+
+<template name="auth">
+  <p align="center">
+    Register a new Account or login
+  </p>
+  <input type="text" id="mail" class="form-control login" placeholder="Email">
+  <input type="text" id="pass" class="form-control login" placeholder="Password">
+  <br>
+  <button type="button" id="register" class="btn btn-info">Register</button>
+  <button type="button" id="login" class="btn btn-info">Login</button>
+</template>
+
+<template name="userInfo">
+  <button type="button" id="logout" class="btn btn-danger">Logout</button>
 </template>
