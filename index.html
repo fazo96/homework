@@ -11,10 +11,9 @@
     </div>
     <div class="center-block" id="quicknotes">
       {{> notes}} {{#if currentUser}}
-      <div align="center">
-        {{> adder}} {{> userInfo}}
-      </div>
-      {{/if}} {{#unless currentUser}} {{> auth}} {{/unless}}
+      <div align="center"> {{> userInfo}} </div>
+      {{/if}}
+      {{#unless currentUser}} <div align="center">{{> auth}}</div>{{/unless}}
     </div>
   </div>
 </body>
@@ -22,31 +21,37 @@
 <template name="notes">
   <ul class="list-group">
     {{#each notes}}
-    <li class="list-group-item">
+    <li class="note list-group-item">
       {{content}}
-      <button type="button" class="btn btn-danger pull-right delete">
+      <!--<button type="button" class="btn btn-danger pull-right delete">
         <i class="fa fa-trash-o"></i>
-      </button>
+      </button>-->
+      <button type="button" class="delete close">&times;</button>
     </li>
     {{/each}}
   </ul>
-</template>
-
-<template name="adder">
-  <input type="text" id="newNote" class="form-control" placeholder="Add new note">
 </template>
 
 <template name="auth">
   <p align="center">
     Register a new Account or login
   </p>
+  {{#each alerts}}
+    <div class="alert alert-warning">
+      {{msg}}
+      <button type="button" class="delete close">&times;</button>
+    </div>
+  {{/each}}
   <input type="text" id="mail" class="form-control login" placeholder="Email">
-  <input type="text" id="pass" class="form-control login" placeholder="Password">
+  <input type="password" id="pass" class="form-control login" placeholder="Password">
   <br>
-  <button type="button" id="register" class="btn btn-info">Register</button>
-  <button type="button" id="login" class="btn btn-info">Login</button>
+  <p>Password must be at least 8 characters. Email must be a valid email</p>
+  <button type="button" id="register" class="btn-login btn btn-info">Register</button>
+  <button type="button" id="login" class="btn-login btn btn-info">Login</button>
 </template>
 
 <template name="userInfo">
+  <input type="text" id="newNote" class="form-control" placeholder="Add new note">
+  <p>Logged in as {{in}}</p>
   <button type="button" id="logout" class="btn btn-danger">Logout</button>
 </template>

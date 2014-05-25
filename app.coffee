@@ -1,7 +1,7 @@
-todos = new Meteor.Collection "todos"
+notes = new Meteor.Collection "notes"
 
 if Meteor.isServer
-  #todos.insert { content: "Example" } unless todos.find().fetch().length > 0
+  #notes.insert { content: "Example" } unless notes.find().fetch().length > 0
   # Accounts
   ###
   Accounts.registerLoginHandler (req) ->
@@ -18,48 +18,55 @@ if Meteor.isServer
     loginExpirationInDays: 1
   }
 
-  Meteor.publish "todos", ->
-    todos.find( { userId: @userId } )
+  Meteor.publish "my-notes", ->
+    notes.find( { userId: @userId } ) unless not @userId
 
 if Meteor.isClient
-  Meteor.subscribe "todos"
+  Meteor.subscribe "my-notes"
   # Notes template
   Template.notes.notes = ->
-    todos.find().fetch()
+    notes.find().fetch()
   Template.notes.events {
     'click .delete': ->
-      todos.remove @_id
+      notes.remove @_id
   }
-  # Template for new notes
-  Template.adder.events {
-    'keypress #newNote': (e,template) ->
-      if e.keyCode is 13
-        console.log Meteor.userId()
-        todos.insert {
-          content: template.find('#newNote').value
-          userId: Meteor.userId()
-        }
-        template.find('#newNote').value = ""
-  }
-  # Auth template
+
+  # Auth
+  Template.auth.alerts = []
+  Template.auth.errCallback = (err) ->
+    Template.auth.alert { msg: err.reason }
+
+  Template.auth.alert = (add,remove) ->
+    if add then Template.auth.alerts.push add;
+    if remove
+      Template.auth.alerts.splice Template.auth.alerts.indexOf(remove), 1
+    Template.auth.alerts
+
   Template.auth.events {
+    'click .delete': (e,template) -> Template.auth.alert null, this
     'keypress .login': (e,template) ->
-      if e.keyCode is 13
-        # Login
-        mail = template.find('#mail').value; pass = template.find('#pass').value
-        Accounts.loginWithPassword mail, pass, (err) ->
-          if err then console.log err else console.log "OK"
+      mail = template.find('#mail').value; pass = template.find('#pass').value
+      if e.keyCode is 13 # Login
+        Meteor.loginWithPassword mail, pass, Template.auth.errCallback
+    # Login
     'click #login': (e,template) ->
       mail = template.find('#mail').value; pass = template.find('#pass').value
-      Meteor.loginWithPassword mail, pass, (err) ->
-        if err then console.log err else console.log "OK"
+      Meteor.loginWithPassword mail, pass, Template.auth.errCallback
+    # Register
     'click #register': (e,template) ->
       mail = template.find('#mail').value; pass = template.find('#pass').value
-      Accounts.createUser { email: mail, password: pass }, (err) ->
-        if err then console.log err else console.log "OK"
+      Accounts.createUser { email: mail, password: pass }, Template.auth.errCallback
   }
   # User Logged In
   Template.userInfo.events {
     'click #logout': (e,template) ->
       Meteor.logout()
+    'keypress #newNote': (e,template) ->
+      if e.keyCode is 13
+        notes.insert {
+          content: template.find('#newNote').value
+          userId: Meteor.userId()
+        }
+        template.find('#newNote').value = ""
   }
+  Template.userInfo.in = -> Meteor.user().emails[0].address
