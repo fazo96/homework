@@ -1,34 +1,49 @@
-.page-header {
-  text-align: center;
-}
-
+/* Generics */
 input {
   text-align:center;
+}
+
+.page-header {
+  text-align: center;
 }
 
 .container {
   max-width: 700px;
 }
 
-#quicknotes {
-  max-width: 500px;
-}
-
-.delete {
-  margin-top: -2px;
-}
-
 .close {
-  margin-right: 5px;
+  clear:both;
 }
 
-.edit {
-  clear: right;
+/* Custom Classes */
+
+.edit-note {
   float: left;
+  margin-right: 10px;
+}
+
+.btn-auth {
+  width: 100px;
+}
+
+.close-note {
+  float: right;
+  margin-top: -24px;
+}
+
+.close-notification{
+  float: right;
+  margin-top: -22px;
 }
 
 .area {
   resize: none;
+}
+
+/* IDs */
+
+#quicknotes {
+  max-width: 500px;
 }
 
 #newNote {
@@ -38,8 +53,4 @@ input {
 
 #mail {
   margin-bottom: 10px;
-}
-
-.btn-login {
-  width: 100px;
 }

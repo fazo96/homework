@@ -22,53 +22,67 @@ if Meteor.isServer
     notes.find( { userId: @userId } ) unless not @userId
 
 if Meteor.isClient
+
   Meteor.subscribe "my-notes"
+
   # Notes template
-  Template.notes.notes = ->
-    notes.find().fetch()
+  Template.notes.notes = -> notes.find().fetch()
   Template.notes.events {
-    'click .delete': -> notes.remove @_id
-    'click .edit': ->
-      Template.edit.note = this; console.log Template.edit.note
-      UI.render Template.edit
+    'click .close-note': -> notes.remove @_id
+    'click .edit': -> Session.set 'note', this
   }
 
-  # Note Editor TODO: Make Reactive
-  Template.edit.show = ->
-    console.log Template.edit.note isnt undefined
-    Template.edit.note isnt undefined
-  Template.edit.note = undefined
-  Template.edit.events {
-    'click .close': -> Template.edit.note = undefined
+  # Note Editor
+  Template.editor.show = -> Session.get 'note'
+  Template.editor.events {
+    'click .close': -> Session.set 'note', undefined
     'click .save': -> null
   }
 
-  # Auth
-  Template.auth.alerts = []
-  Template.auth.errCallback = (err) ->
-    Template.auth.alert { msg: err.reason }
-
-  # TODO: make reactive
-  Template.auth.alert = (add,remove) ->
-    if add then Template.auth.alerts.push add
-    if remove
-      Template.auth.alerts.splice Template.auth.alerts.indexOf(remove), 1
-    Template.auth.alerts
-
+  # Notifications
+  alerts = []
+  alertDep = new Deps.Dependency
+  errCallback = (err) -> notify { msg: err.reason }
+  # Show a notification
+  notify = (data) ->
+    alerts.push {
+      title: data.title
+      msg: data.msg
+      id: data.id or alerts.length
+      type: data.type or "danger"
+    }; alertDep.changed()
+  # Clear all notifications
+  clearNotifications = -> alerts.clear(); alertDep.changed()
+  # Get all the notifications
+  Template.notifications.notification = -> alertDep.depend(); alerts
+  Template.notifications.events {
+    'click .close-notification': (e,template) ->
+      alerts.splice alerts.indexOf(this), 1
+      alertDep.changed()
+  }
+  pressLogin = (template) ->
+    mail = template.find('#mail').value; pass = template.find('#pass').value
+    Meteor.loginWithPassword mail, pass, (err) ->
+      errCallback err; if Meteor.userId() then clearNotifications()
+  # Login and Register
   Template.auth.events {
-    'click .delete': (e,template) -> Template.auth.alert null, this
     'keypress .login': (e,template) ->
-      mail = template.find('#mail').value; pass = template.find('#pass').value
-      if e.keyCode is 13 # Login
-        Meteor.loginWithPassword mail, pass, Template.auth.errCallback
+      if e.keyCode is 13 then pressLogin template
     # Login
-    'click #login': (e,template) ->
-      mail = template.find('#mail').value; pass = template.find('#pass').value
-      Meteor.loginWithPassword mail, pass, Template.auth.errCallback
+    'click #login': (e,template) -> pressLogin template
     # Register
     'click #register': (e,template) ->
       mail = template.find('#mail').value; pass = template.find('#pass').value
-      Accounts.createUser { email: mail, password: pass }, Template.auth.errCallback
+      if not mail or mail.contains '@' is no or mail.endsWith '.' is yes or mail.endsWith '@' is yes
+        notify { msg: "Invalid Email" }
+      else
+        try
+          Accounts.createUser {
+            email: mail,
+            password: pass
+          }, (e) -> errCallback e; if Meteor.userId() then clearNotifications()
+        catch err
+          notify { msg: err }
   }
   # User Logged In
   Template.userInfo.events {
