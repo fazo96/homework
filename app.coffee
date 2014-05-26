@@ -1,18 +1,6 @@
 notes = new Meteor.Collection "notes"
 
 if Meteor.isServer
-  #notes.insert { content: "Example" } unless notes.find().fetch().length > 0
-  # Accounts
-  ###
-  Accounts.registerLoginHandler (req) ->
-    return null unless req.mail and req.password
-    return null unless req.mail.length > 4 and req.pass.length >= 8
-    user = Meteor.users.findOne { mail: req.mail }
-    if not user
-      user = Meteor.insert { mail: req.mail, password: req.password }
-    { id: user._id }
-  ###
-
   Accounts.config {
     sendVerificationEmail: true
     loginExpirationInDays: 1
