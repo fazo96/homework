@@ -10,7 +10,7 @@
       </h1>
     </div>
     <div class="center-block" id="quicknotes">
-      {{> notes}} {{#if currentUser}}
+      {{> edit}} {{> notes}} {{#if currentUser}}
       <div align="center"> {{> userInfo}} </div>
       {{/if}}
       {{#unless currentUser}} <div align="center">{{> auth}}</div>{{/unless}}
@@ -22,10 +22,8 @@
   <ul class="list-group">
     {{#each notes}}
     <li class="note list-group-item">
+      <button type="button" class="edit close"><i class="fa fa-pencil-square-o"></i></button>
       {{content}}
-      <!--<button type="button" class="btn btn-danger pull-right delete">
-        <i class="fa fa-trash-o"></i>
-      </button>-->
       <button type="button" class="delete close">&times;</button>
     </li>
     {{/each}}
@@ -54,4 +52,20 @@
   <input type="text" id="newNote" class="form-control" placeholder="Add new note">
   <p>Logged in as {{in}}</p>
   <button type="button" id="logout" class="btn btn-danger">Logout</button>
+</template>
+
+<template name="edit">
+  {{#if note}}
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        <input type="text" class="form-control title" placeholder="Title">
+        <button type="button" class="close">&times;</button>
+      </h3>
+    </div>
+    <div class="panel-body">
+      <textarea class="area form-control" rows="3">{{note.content}}</textarea>
+    </div>
+  </div>
+  {{/if}}
 </template>

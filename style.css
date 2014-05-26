@@ -1,6 +1,5 @@
 .page-header {
   text-align: center;
-  align: center;
 }
 
 input {
@@ -17,6 +16,19 @@ input {
 
 .delete {
   margin-top: -2px;
+}
+
+.close {
+  margin-right: 5px;
+}
+
+.edit {
+  clear: right;
+  float: left;
+}
+
+.area {
+  resize: none;
 }
 
 #newNote {

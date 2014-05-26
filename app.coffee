@@ -27,8 +27,20 @@ if Meteor.isClient
   Template.notes.notes = ->
     notes.find().fetch()
   Template.notes.events {
-    'click .delete': ->
-      notes.remove @_id
+    'click .delete': -> notes.remove @_id
+    'click .edit': ->
+      Template.edit.note = this; console.log Template.edit.note
+      UI.render Template.edit
+  }
+
+  # Note Editor TODO: Make Reactive
+  Template.edit.show = ->
+    console.log Template.edit.note isnt undefined
+    Template.edit.note isnt undefined
+  Template.edit.note = undefined
+  Template.edit.events {
+    'click .close': -> Template.edit.note = undefined
+    'click .save': -> null
   }
 
   # Auth
@@ -36,8 +48,9 @@ if Meteor.isClient
   Template.auth.errCallback = (err) ->
     Template.auth.alert { msg: err.reason }
 
+  # TODO: make reactive
   Template.auth.alert = (add,remove) ->
-    if add then Template.auth.alerts.push add;
+    if add then Template.auth.alerts.push add
     if remove
       Template.auth.alerts.splice Template.auth.alerts.indexOf(remove), 1
     Template.auth.alerts
