@@ -24,7 +24,7 @@
     {{#each notes}}
     <li class="note list-group-item">
       <button type="button" class="edit-note close"><i class="fa fa-pencil-square-o"></i></button>
-      {{content}}
+      <b>{{title}}</b> <span class="subtitle">{{content}}</span>
       <button type="button" class="close-note close">&times;</button>
     </li>
     {{/each}}
@@ -58,12 +58,14 @@
   <div class="panel panel-info">
     <div class="panel-heading">
       <h3 class="panel-title">
-        <input type="text" class="form-control title" placeholder="Title">
+        <div align="center">
+        <input type="text" class="form-control title" value="{{note.title}}" placeholder="Title"></div>
         <button type="button" class="close close-editor">&times;</button>
       </h3>
     </div>
-    <div class="panel-body">
-      <textarea class="area form-control" rows="3">{{note.content}}</textarea>
+    <div align="center" class="panel-body">
+      <textarea class="area form-control" rows="3" placeholder="">{{note.content}}</textarea>
+      <button type="button" class="btn btn-info save-editor">Save</button>
     </div>
   </div>
   {{/if}}

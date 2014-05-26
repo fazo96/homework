@@ -15,11 +15,24 @@ input {
   clear:both;
 }
 
+.subtitle { color: #999; }
+
 /* Custom Classes */
 
 .edit-note {
   float: left;
   margin-right: 10px;
+}
+
+.title { width: 85%; }
+
+.close-editor {
+  margin-top: -28px;
+  margin-right: 5px;
+}
+
+.save-editor {
+  margin-top: 10px;
 }
 
 .btn-auth {

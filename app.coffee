@@ -13,19 +13,39 @@ if Meteor.isClient
 
   Meteor.subscribe "my-notes"
 
+  # User Interface
+  Template.userInfo.events {
+    'click #logout': (e,template) ->
+      Meteor.logout()
+    'keypress #newNote': (e,template) ->
+      if e.keyCode is 13
+        notes.insert {
+          title: template.find('#newNote').value
+          content: "..."
+          userId: Meteor.userId()
+        }
+        template.find('#newNote').value = ""
+  }
+  Template.userInfo.in = -> Meteor.user().emails[0].address
+
   # Notes template
-  Template.notes.notes = -> notes.find().fetch()
+  Template.notes.notes = ->
+    d = notes.find().fetch();
+    #d.splice d.indexOf(Session.get('note')), 1 ; d
   Template.notes.events {
     'click .close-note': -> notes.remove @_id
-    'click .edit': -> Session.set 'note', this
+    'click .edit-note': -> Session.set 'note', this
   }
 
   # Note Editor
-  Template.editor.show = -> Session.get 'note'
-  Template.editor.events {
-    'click .close': -> Session.set 'note', undefined
-    'click .save': -> null
-  }
+  Template.editor.note = -> Session.get 'note'
+  Template.editor.events
+    'click .close-editor': -> Session.set 'note', undefined
+    'click .save-editor': (e,t) ->
+      notes.update Session.get('note')._id,
+        $set:
+          title: t.find('.title').value
+          content: t.find('.area').value
 
   # Notifications
   alerts = []
@@ -48,11 +68,12 @@ if Meteor.isClient
       alerts.splice alerts.indexOf(this), 1
       alertDep.changed()
   }
+
+  # Login and Register
   pressLogin = (template) ->
     mail = template.find('#mail').value; pass = template.find('#pass').value
     Meteor.loginWithPassword mail, pass, (err) ->
       errCallback err; if Meteor.userId() then clearNotifications()
-  # Login and Register
   Template.auth.events {
     'keypress .login': (e,template) ->
       if e.keyCode is 13 then pressLogin template
@@ -72,16 +93,3 @@ if Meteor.isClient
         catch err
           notify { msg: err }
   }
-  # User Logged In
-  Template.userInfo.events {
-    'click #logout': (e,template) ->
-      Meteor.logout()
-    'keypress #newNote': (e,template) ->
-      if e.keyCode is 13
-        notes.insert {
-          content: template.find('#newNote').value
-          userId: Meteor.userId()
-        }
-        template.find('#newNote').value = ""
-  }
-  Template.userInfo.in = -> Meteor.user().emails[0].address
