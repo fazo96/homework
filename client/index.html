@@ -3,19 +3,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 <body>
+  {{> ribbon}}
   <div class="container">
     <div class="page-header">
       <h1 id="title">Homework<br>
         <small id="small">management for students</small>
       </h1>
     </div>
-    <div class="center-block" id="quicknotes">
+    <div class="center-block" id="ui-container">
       {{#if currentUser}}
         {{> editor}} {{> notes}} {{> userInfo}}
       {{else}}
         {{> auth}}
       {{/if}}
     </div>
+    <div class="center-block" align="center">{{> footer}}</div>
   </div>
 </body>
 
@@ -29,6 +31,9 @@
     </li>
     {{/each}}
   </ul>
+  <div align="center">
+    <input type="text" id="newNote" class="form-control" placeholder="Add new note">
+  </div>
 </template>
 
 <template name="auth">
@@ -52,10 +57,9 @@
   </div>
 </template>
 
-<template name="userInfo">
+<template name="userInfo"><hr>
   <div align="center">
-    <input type="text" id="newNote" class="form-control" placeholder="Add new note">
-    <p>Logged in as {{in}}</p>
+    <p>{{in}}</p>
     <button type="button" id="logout" class="btn btn-danger">Logout</button>
   </div>
 </template>
@@ -86,4 +90,21 @@
     <button type="button" class="close close-notification">&times;</button>
   </div>
 {{/each}}
+</template>
+
+<template name="footer">
+  <hr>
+  <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
+  <p>Built by Enrico Fasoli</p>
+  <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
+  <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
+  <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
+</template>
+
+<template name="ribbon">
+<div class="github-fork-ribbon-wrapper right">
+  <div class="github-fork-ribbon">
+    <a href="http://github.com/fazo96/homework">Fork me on GitHub</a>
+  </div>
+</div>
 </template>

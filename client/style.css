@@ -15,6 +15,9 @@ input {
   clear:both;
 }
 
+.custom-link { color: #999; }
+.custom-link:hover { color: #101010;}
+
 .subtitle { color: #999; }
 
 /* Custom Classes */
@@ -64,7 +67,12 @@ input {
 
 /* IDs */
 
-#quicknotes {
+.footer-center-icon {
+  margin-left: 10px;
+  margin-right: 10px
+}
+
+#ui-container {
   max-width: 500px;
 }
 

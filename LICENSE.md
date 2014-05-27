@@ -1,14 +1,3 @@
-# Homework
-Schoolwork management application for students.
-
-### Try it
-[the app is hosted online!](http://homework.meteor.com)
-
-### Development
-Clone the repo, [install meteor](http://meteor.com) and **meteorite**.
-Install dependent packages and then run `meteor`. That's it.
-
-### License
 The MIT License (MIT)
 
 Copyright (c) 2014 Enrico Fasoli
