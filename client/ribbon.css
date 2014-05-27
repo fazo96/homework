@@ -140,3 +140,10 @@ to tweak the top and right values in .github-fork-ribbon. */
   -o-transform: rotate(-45deg);
   transform: rotate(-45deg);
 }
+
+/* Hide ribbon on small screens. */
+@media (max-width:450px) {
+  .github-fork-ribbon-wrapper{
+    display: none;
+  }
+}
