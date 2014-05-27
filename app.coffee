@@ -29,6 +29,8 @@ if Meteor.isClient
   Template.userInfo.in = -> Meteor.user().emails[0].address
 
   # Notes template
+  Template.notes.truncateNoteDesc = (s) ->
+    if s.length > 52 then s.slice(0,48)+"..." else s
   Template.notes.notes = ->
     d = notes.find().fetch();
     #d.splice d.indexOf(Session.get('note')), 1 ; d
@@ -39,13 +41,17 @@ if Meteor.isClient
 
   # Note Editor
   Template.editor.note = -> Session.get 'note'
+  saveCurrentNote = (t,e) ->
+    if e and e.keyCode isnt 13 then return;
+    notes.update Session.get('note')._id,
+      $set:
+        title: t.find('.title').value
+        content: t.find('.area').value
   Template.editor.events
     'click .close-editor': -> Session.set 'note', undefined
-    'click .save-editor': (e,t) ->
-      notes.update Session.get('note')._id,
-        $set:
-          title: t.find('.title').value
-          content: t.find('.area').value
+    'click .save-editor': (e,t) -> saveCurrentNote t
+    #'keypress .edit-note': (e,t) -> saveCurrentNote t, e # Doesnt work??
+    'keypress .title': (e,t) -> saveCurrentNote t, e
 
   # Notifications
   alerts = []

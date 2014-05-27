@@ -24,7 +24,7 @@
     {{#each notes}}
     <li class="note list-group-item">
       <button type="button" class="edit-note close"><i class="fa fa-pencil-square-o"></i></button>
-      <b>{{title}}</b> <span class="subtitle">{{content}}</span>
+      <b>{{title}}</b> <span class="subtitle">{{truncateNoteDesc content}}</span>
       <button type="button" class="close-note close">&times;</button>
     </li>
     {{/each}}
