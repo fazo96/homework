@@ -35,12 +35,20 @@
   <div align="center">
     <p>Register a new Account or login</p>
     {{> notifications }}
-    <input type="text" id="mail" class="form-control login" placeholder="Email">
-    <input type="password" id="pass" class="form-control login" placeholder="Password">
-    <br>
+    {{#if working}}
+      <div align="center" class="spinning-cog">
+        <i class="fa fa-cog fa-spin fa-3x"></i>
+      </div>
+    {{else}}
+      <input type="text" id="mail" class="form-control login" placeholder="Email">
+      <input type="password" id="pass" class="form-control login" placeholder="Password">
+      <br>
+    {{/if}}
     <p>Password must be at least 8 characters. Email must be a valid email</p>
-    <button type="button" id="register" class="btn-auth btn btn-info">Register</button>
-    <button type="button" id="login" class="btn-auth btn btn-info">Login</button>
+    {{#unless working}}
+      <button type="button" id="register" class="btn-auth btn btn-info">Register</button>
+      <button type="button" id="login" class="btn-auth btn btn-info">Login</button>
+    {{/unless}}
   </div>
 </template>
 
@@ -73,7 +81,7 @@
 
 <template name="notifications">
 {{#each notification}}
-  <div class="alert alert-{{type}}">
+  <div class="alert alert-{{type}} notification">
     <p align="center">{{msg}}</p>
     <button type="button" class="close close-notification">&times;</button>
   </div>

@@ -19,6 +19,15 @@ input {
 
 /* Custom Classes */
 
+.notification {
+  max-width: 80%;
+}
+
+.spinning-cog {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
 .edit-note {
   float: left;
   margin-right: 10px;

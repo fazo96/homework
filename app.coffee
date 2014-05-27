@@ -1,22 +1,31 @@
 notes = new Meteor.Collection "notes"
 
+# Server
 if Meteor.isServer
   Accounts.config {
-    sendVerificationEmail: true
+    sendVerificationEmail: false
     loginExpirationInDays: 1
   }
 
   Meteor.publish "my-notes", ->
     notes.find( { userId: @userId } ) unless not @userId
 
-if Meteor.isClient
+  # Authentication
+  Accounts.validateNewUser (user) ->
+    if user.email and Meteor.check(user.email,String) is yes and user.email.contains '@' is yes and user.email.endsWith '.' is no and user.email.endsWith '@' is no
+      return yes
+    else throw new Meteor.Error 403, "Invalid Email"
+    if user.password and Meteor.check(user.password,String) is yes and user.password.length > 7
+      return yes
+    else throw new Meteor.Error 403, "Password invalid"
 
-  Meteor.subscribe "my-notes"
+# Client
+if Meteor.isClient
+  Deps.autorun -> Meteor.subscribe "my-notes" unless not Meteor.userId()
 
   # User Interface
   Template.userInfo.events {
-    'click #logout': (e,template) ->
-      Meteor.logout()
+    'click #logout': (e,template) -> Meteor.logout()
     'keypress #newNote': (e,template) ->
       if e.keyCode is 13
         notes.insert {
@@ -79,7 +88,8 @@ if Meteor.isClient
   pressLogin = (template) ->
     mail = template.find('#mail').value; pass = template.find('#pass').value
     Meteor.loginWithPassword mail, pass, (err) ->
-      errCallback err; if Meteor.userId() then clearNotifications()
+      errCallback err
+  Template.auth.working = -> Meteor.loggingIn()
   Template.auth.events {
     'keypress .login': (e,template) ->
       if e.keyCode is 13 then pressLogin template
@@ -95,7 +105,7 @@ if Meteor.isClient
           Accounts.createUser {
             email: mail,
             password: pass
-          }, (e) -> errCallback e; if Meteor.userId() then clearNotifications()
+          }, (e) -> errCallback e
         catch err
           notify { msg: err }
   }
