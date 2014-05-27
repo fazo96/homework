@@ -2,7 +2,7 @@
 notes = new Meteor.Collection "notes"
 
 Accounts.config {
-  sendVerificationEmail: true
+  sendVerificationEmail: false
   loginExpirationInDays: 1
 }
 
