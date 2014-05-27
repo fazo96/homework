@@ -1,7 +1,6 @@
 # Homework - Client Side
 notes = new Meteor.Collection "notes"
 Deps.autorun -> Meteor.subscribe "my-notes" unless not Meteor.userId()
-#Meteor.subscribe "my-notes"
 
 # User Interface
 Template.userInfo.events {

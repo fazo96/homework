@@ -1,6 +1,10 @@
 # Homework - Server Side
 notes = new Meteor.Collection "notes"
 
+validateEmail = (email) ->
+  expr = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
+  expr.test email
+
 Accounts.config {
   sendVerificationEmail: false
   loginExpirationInDays: 1
@@ -11,8 +15,7 @@ Meteor.publish "my-notes", ->
 
 # Authentication
 Accounts.validateNewUser (user) ->
-  if Match.test(user.email, String) and validateEmail user.email is yes
-    if user.password and Match.test(user.password,String) is yes and user.password.length > 7
-      return yes
-    else throw new Meteor.Error 403, "Invalid Password"
-  else throw new Meteor.Error 403, "Invalid Email"
+  mail = user.emails[0].address
+  if Match.test(mail,String) is no or validateEmail(mail) is no
+    throw new Meteor.Error 403, "Invalid Email"
+  return yes
