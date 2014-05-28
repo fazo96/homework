@@ -25,8 +25,12 @@
   <ul class="list-group">
     {{#each notes}}
     <li class="note list-group-item">
-      <button type="button" class="edit-note close"><i class="fa fa-pencil-square-o"></i></button>
-      <b>{{title}}</b> <span class="subtitle">{{truncateNoteDesc content}}</span>
+      <span class="note-content">
+        <button type="button" class="edit-note close">
+          <i class="fa fa-pencil-square-o"></i>
+        </button>
+        <b>{{title}}</b> <span class="note-desc">{{content}}</span>
+      </span>
       <button type="button" class="close-note close">&times;</button>
     </li>
     {{/each}}
@@ -70,8 +74,9 @@
     <div class="panel-heading">
       <h3 class="panel-title">
         <div align="center">
-        <input type="text" class="form-control title" value="{{note.title}}" placeholder="Title"></div>
-        <button type="button" class="close close-editor">&times;</button>
+          <input type="text" class="form-control editor-title" value="{{note.title}}" placeholder="Title">
+          <button type="button" class="close close-editor">&times;</button>
+        </div>
       </h3>
     </div>
     <div align="center" class="panel-body">

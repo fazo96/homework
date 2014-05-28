@@ -36,7 +36,7 @@ saveCurrentNote = (t,e) ->
   if e and e.keyCode isnt 13 then return;
   notes.update Session.get('note')._id,
     $set:
-      title: t.find('.title').value
+      title: t.find('.editor-title').value
       content: t.find('.area').value
 Template.editor.events
   'click .close-editor': -> Session.set 'note', undefined

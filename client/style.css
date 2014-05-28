@@ -1,4 +1,4 @@
-/* Generics */
+/* Generics and bootstrap classes */
 input {
   text-align:center;
 }
@@ -7,20 +7,35 @@ input {
   text-align: center;
 }
 
-.container {
-  max-width: 700px;
-}
-
 .close {
   clear:both;
 }
 
+/* Custom Classes */
 .custom-link { color: #999; }
 .custom-link:hover { color: #101010;}
 
-.subtitle { color: #999; }
+.note {
+  padding-bottom: 5px;
+}
 
-/* Custom Classes */
+.note-content {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  width:95%;
+  text-overflow: ellipsis;
+}
+
+.close-note {
+  float: right;
+  margin-top: -2px;
+}
+
+.note-desc {
+  color: #999;
+}
+
 .notification, .error {
   max-width: 80%;
 }
@@ -31,13 +46,19 @@ input {
 }
 
 .edit-note {
+  display: inline-block;
   float: left;
   margin-right: 10px;
 }
 
-.title { width: 85%; }
+.editor-title { width: 70%; }
+@media (max-width: 400px) {
+  .editor-title { width: 65%; }
+}
+
 
 .close-editor {
+  float: right;
   margin-top: -28px;
   margin-right: 5px;
 }
@@ -48,11 +69,6 @@ input {
 
 .btn-auth {
   width: 100px;
-}
-
-.close-note {
-  float: right;
-  margin-top: -24px;
 }
 
 .close-notification, .close-error {
@@ -72,7 +88,9 @@ input {
 }
 
 #ui-container {
-  max-width: 500px;
+  width: 90%;
+  min-width: 300px;
+  max-width: 550px;
 }
 
 #newNote {
