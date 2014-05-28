@@ -10,7 +10,12 @@ Accounts.config {
   loginExpirationInDays: 1
 }
 
+# Returns true if the user has verified at least one email address
+userValidated = (user) ->
+  return yes for mail in user.emails when mail.verified is yes; no
+
 Meteor.publish "my-notes", ->
+  # TODO: Don't publish unless user is validated
   notes.find( { userId: @userId } ) unless not @userId
 
 # Authentication
@@ -19,3 +24,10 @@ Accounts.validateNewUser (user) ->
   if Match.test(mail,String) is no or validateEmail(mail) is no
     throw new Meteor.Error 403, "Invalid Email"
   return yes
+
+# Methods that the clients can invoke
+Meteor.methods
+  amIValidated: ->
+    user = Meteor.users.findOne { _id: @userId }
+    return no unless user?
+    userValidated user

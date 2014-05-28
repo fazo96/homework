@@ -75,7 +75,7 @@
       </h3>
     </div>
     <div align="center" class="panel-body">
-      <textarea class="area form-control" rows="3" placeholder="">{{note.content}}</textarea>
+      <textarea class="area form-control" rows="3" placeholder="...">{{note.content}}</textarea>
       <button type="button" class="btn btn-info save-editor">Save</button>
     </div>
   </div>
@@ -91,15 +91,6 @@
 {{/each}}
 </template>
 
-<template name="footer">
-  <hr>
-  <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
-  <p>Built by Enrico Fasoli as a prototype.<br><u>Not ready for daily usage yet!</u></p>
-  <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
-  <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
-  <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
-</template>
-
 <template name="ribbon">
 <div class="github-fork-ribbon-wrapper right">
   <div class="github-fork-ribbon">
@@ -112,4 +103,13 @@
   <div align="center" class="spinning-cog">
     <i class="fa fa-cog fa-spin fa-3x"></i>
   </div>
+</template>
+
+<template name="footer">
+  <hr>
+  <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
+  <p>Built by Enrico Fasoli as a prototype.<br><u>Not ready for daily usage yet!</u></p>
+  <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
+  <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
+  <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
 </template>

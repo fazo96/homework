@@ -1,6 +1,7 @@
 # Homework - Client Side
 notes = new Meteor.Collection "notes"
 Deps.autorun -> Meteor.subscribe "my-notes" unless not Meteor.userId()
+user = -> Meteor.user()
 # Loading (Spinning Cog)
 UI.registerHelper "loggingIn", -> Meteor.loggingIn()
 
@@ -15,18 +16,20 @@ Template.notes.truncateNoteDesc = (s) ->
   if s.length > 52 then s.slice(0,48)+"..." else s
 Template.notes.notes = ->
   d = notes.find().fetch()
-Template.notes.events {
-  'click .close-note': -> notes.remove @_id
+Template.notes.events
+  'click .close-note': ->
+    if Session.get('note')._id is @_id
+      Session.set 'note', undefined
+    notes.remove @_id
   'click .edit-note': -> Session.set 'note', this
   'keypress #newNote': (e,template) ->
-    if e.keyCode is 13
+    if e.keyCode is 13 and template.find('#newNote').value isnt ""
       notes.insert {
         title: template.find('#newNote').value
-        content: "..."
+        content: ""
         userId: Meteor.userId()
       }
       template.find('#newNote').value = ""
-}
 
 # Note Editor
 Template.editor.note = -> Session.get 'note'
@@ -39,7 +42,6 @@ saveCurrentNote = (t,e) ->
 Template.editor.events
   'click .close-editor': -> Session.set 'note', undefined
   'click .save-editor': (e,t) -> saveCurrentNote t
-  #'keypress .edit-note': (e,t) -> saveCurrentNote t, e # Doesnt work??
   'keypress .title': (e,t) -> saveCurrentNote t, e
 
 # Notifications
@@ -58,22 +60,21 @@ notify = (data) ->
 clearNotifications = -> alerts.clear(); alertDep.changed()
 # Get all the notifications
 Template.notifications.notification = -> alertDep.depend(); alerts
-Template.notifications.events {
+Template.notifications.events
   'click .close-notification': (e,template) ->
     alerts.splice alerts.indexOf(this), 1
     alertDep.changed()
-}
+
+# "Loading" template
+Template.loading.status = -> Meteor.status()
 
 # Login and Register
 pressLogin = (template) ->
   mail = template.find('#mail').value; pass = template.find('#pass').value
-  Meteor.loginWithPassword mail, pass, (err) ->
-    errCallback err
-
-Template.auth.events {
-  'keypress .login': (e,template) ->
-    if e.keyCode is 13 then pressLogin template
+  Meteor.loginWithPassword mail, pass, (err) -> errCallback err
+Template.auth.events
   # Login
+  'keypress .login': (e,template) -> if e.keyCode is 13 then pressLogin template
   'click #login': (e,template) -> pressLogin template
   # Register
   'click #register': (e,template) ->
@@ -92,4 +93,3 @@ Template.auth.events {
         }, (e) -> errCallback e
       catch err
         notify { msg: err }
-}
