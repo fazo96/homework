@@ -40,10 +40,8 @@
   <div align="center">
     <p>Register a new Account or login</p>
     {{> notifications }}
-    {{#if working}}
-      <div align="center" class="spinning-cog">
-        <i class="fa fa-cog fa-spin fa-3x"></i>
-      </div>
+    {{#if loggingIn}}
+      {{> loading}}
     {{else}}
       <input type="text" id="mail" class="form-control login" placeholder="Email">
       <input type="password" id="pass" class="form-control login" placeholder="Password">
@@ -58,6 +56,7 @@
 </template>
 
 <template name="userInfo"><hr>
+  {{#if loggingIn}} {{> loading}} {{/if}}
   <div align="center">
     <p>{{in}}</p>
     <button type="button" id="logout" class="btn btn-danger">Logout</button>
@@ -95,7 +94,7 @@
 <template name="footer">
   <hr>
   <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
-  <p>Built by Enrico Fasoli</p>
+  <p>Built by Enrico Fasoli as a prototype.<br><u>Not ready for daily usage yet!</u></p>
   <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
   <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
   <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
@@ -107,4 +106,10 @@
     <a href="http://github.com/fazo96/homework">Fork me on GitHub</a>
   </div>
 </div>
+</template>
+
+<template name="loading">
+  <div align="center" class="spinning-cog">
+    <i class="fa fa-cog fa-spin fa-3x"></i>
+  </div>
 </template>

@@ -1,6 +1,8 @@
 # Homework - Client Side
 notes = new Meteor.Collection "notes"
 Deps.autorun -> Meteor.subscribe "my-notes" unless not Meteor.userId()
+# Loading (Spinning Cog)
+UI.registerHelper "loggingIn", -> Meteor.loggingIn()
 
 # User Interface
 Template.userInfo.events {
@@ -67,7 +69,7 @@ pressLogin = (template) ->
   mail = template.find('#mail').value; pass = template.find('#pass').value
   Meteor.loginWithPassword mail, pass, (err) ->
     errCallback err
-Template.auth.working = -> Meteor.loggingIn()
+
 Template.auth.events {
   'keypress .login': (e,template) ->
     if e.keyCode is 13 then pressLogin template
