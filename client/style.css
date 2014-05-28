@@ -21,8 +21,7 @@ input {
 .subtitle { color: #999; }
 
 /* Custom Classes */
-
-.notification {
+.notification, .error {
   max-width: 80%;
 }
 
@@ -56,7 +55,7 @@ input {
   margin-top: -24px;
 }
 
-.close-notification{
+.close-notification, .close-error {
   float: right;
   margin-top: -22px;
 }

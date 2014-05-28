@@ -39,7 +39,7 @@
 <template name="auth">
   <div align="center">
     <p>Register a new Account or login</p>
-    {{> notifications }}
+    {{> error}}
     {{#if loggingIn}}
       {{> loading}}
     {{else}}
@@ -64,7 +64,7 @@
 </template>
 
 <template name="editor">
-  <div align="center">{{> notifications }}</div>
+  <div align="center">{{> error }}</div>
   {{#if note}}
   <div class="panel panel-info">
     <div class="panel-heading">
@@ -89,6 +89,15 @@
     <button type="button" class="close close-notification">&times;</button>
   </div>
 {{/each}}
+</template>
+
+<template name="error">
+{{#if error}}
+  <div class="alert alert-{{error.type}} error">
+    <p align="center">{{error.msg}}</p>
+    <button type="button" class="close close-error">&times;</button>
+  </div>
+{{/if}}
 </template>
 
 <template name="ribbon">
