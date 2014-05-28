@@ -11,8 +11,13 @@
       </h1>
     </div>
     <div class="center-block" id="ui-container">
+      {{> error}}
       {{#if currentUser}}
-        {{> editor}} {{> notes}} {{> userInfo}}
+        {{#if verified}}
+          {{> editor}} {{> notes}} {{> userInfo}}
+        {{else}}
+          {{> verifyEmail}}
+        {{/if}}
       {{else}}
         {{> auth}}
       {{/if}}
@@ -43,7 +48,6 @@
 <template name="auth">
   <div align="center">
     <p>Register a new Account or login</p>
-    {{> error}}
     {{#if loggingIn}}
       {{> loading}}
     {{else}}
@@ -53,8 +57,8 @@
     {{/if}}
     <p>Password must be at least 8 characters. Email must be a valid email</p>
     {{#unless working}}
-      <button type="button" id="register" class="btn-auth btn btn-info">Register</button>
-      <button type="button" id="login" class="btn-auth btn btn-info">Login</button>
+      <button type="button" id="register" class="btn-auth btn btn-success">Register</button>
+      <button type="button" id="login" class="btn-auth btn btn-primary">Login</button>
     {{/unless}}
   </div>
 </template>
@@ -62,8 +66,21 @@
 <template name="userInfo"><hr>
   {{#if loggingIn}} {{> loading}} {{/if}}
   <div align="center">
-    <p>{{in}}</p>
+    <p>{{email}}</p>
     <button type="button" id="logout" class="btn btn-danger">Logout</button>
+  </div>
+</template>
+
+<template name="verifyEmail">
+  <div align="center">
+    <p>Insert the token you received by email at the address {{mail}} here:</p>
+    <input type="text" id="token-field" class="form-control" placeholder="Token">
+    <div align="center" class="buttons">
+      <button type="button" class="btn btn-warning btn-ver" id="btn-resend">Resend Email</button>
+      <button type="button" class="btn btn-success btn-ver" id="btn-verify">Verify Email</button>
+      <button type="button" class="btn btn-danger btn-ver" id="btn-delete">Delete Account</button>
+      <br><button type="button" class="btn btn-primary btn-ver" id="btn-logout">Logout</button>
+    </div>
   </div>
 </template>
 
@@ -98,10 +115,10 @@
 
 <template name="error">
 {{#if error}}
-  <div class="alert alert-{{error.type}} error">
+  <div align="center"><div class="alert alert-{{error.type}} error">
     <p align="center">{{error.msg}}</p>
     <button type="button" class="close close-error">&times;</button>
-  </div>
+  </div></div>
 {{/if}}
 </template>
 

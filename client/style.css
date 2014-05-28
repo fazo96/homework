@@ -52,10 +52,10 @@ input {
 }
 
 .editor-title { width: 70%; }
+
 @media (max-width: 400px) {
   .editor-title { width: 65%; }
 }
-
 
 .close-editor {
   float: right;
@@ -69,6 +69,11 @@ input {
 
 .btn-auth {
   width: 100px;
+}
+
+.btn-ver {
+  width:150px;
+  margin-top:20px;
 }
 
 .close-notification, .close-error {

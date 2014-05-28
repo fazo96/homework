@@ -1,22 +1,34 @@
 # Homework - Server Side
+console.log "Started Homework server!"
+console.log "Sending emails using "+process.env.MAIL_URL
+
 notes = new Meteor.Collection "notes"
 
+getUser = (id) -> Meteor.users.findOne { _id: id }
 validateEmail = (email) ->
   expr = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
   expr.test email
 
 Accounts.config {
-  sendVerificationEmail: false
+  sendVerificationEmail: true
   loginExpirationInDays: 1
 }
 
+Accounts.emailTemplates.siteName = "Homework App";
+Accounts.emailTemplates.verifyEmail.text = (user,url) ->
+  token = url.split('/'); token = token[token.length-1]
+  '''Welcome to Homework! To activate your account, log in then provide the
+  following token: '''+token
+
 # Returns true if the user has verified at least one email address
 userValidated = (user) ->
+  if not user?
+    throw new Meteor.Exception "Impossible! Trying to validate null user"
   return yes for mail in user.emails when mail.verified is yes; no
 
 Meteor.publish "my-notes", ->
-  # TODO: Don't publish unless user is validated
-  notes.find( { userId: @userId } ) unless not @userId
+  if userValidated getUser(@userId)
+    notes.find userId: @userId
 
 # Authentication
 Accounts.validateNewUser (user) ->
@@ -28,6 +40,23 @@ Accounts.validateNewUser (user) ->
 # Methods that the clients can invoke
 Meteor.methods
   amIValidated: ->
-    user = Meteor.users.findOne { _id: @userId }
-    return no unless user?
-    userValidated user
+    u = getUser(@userId)
+    return no unless u?
+    userValidated u
+  resendConfirmEmail: ->
+    u = getUser(@userId)
+    if not u
+      console.log "Validating nonexisting user!!"; return no
+    if userValidated(u) is no
+      Accounts.sendVerificationEmail @userId
+      console.log "Sent verification email to "+u.emails[0].address
+      return yes
+    else
+      console.log "User "+u.emails[0].address+" already validated."
+      return no
+  deleteMe: ->
+    if @userId
+      Meteor.users.remove @userId
+      # Automagically log out the user by invalidating every token he has
+      Meteor.users.update {_id: @userId},
+      {$set : { "resume.loginTokens" : [] } }, { multi: yes }

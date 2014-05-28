@@ -1,15 +1,21 @@
 # Homework - Client Side
 notes = new Meteor.Collection "notes"
 Deps.autorun -> Meteor.subscribe "my-notes" unless not Meteor.userId()
-user = -> Meteor.user()
-# Loading (Spinning Cog)
+validateEmail = (email) ->
+  expr = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
+  expr.test email
+getUser = -> Meteor.user()
+amIValid = ->
+  return no unless getUser()
+  return yes for mail in getUser().emails when mail.verified is yes; no
+# Helpers
 UI.registerHelper "loggingIn", -> Meteor.loggingIn()
+UI.registerHelper "mail", -> getUser().emails[0].address
+UI.registerHelper "verified", -> amIValid()
 
 # User Interface
 Template.userInfo.events
   'click #logout': (e,template) -> Meteor.logout()
-
-Template.userInfo.in = -> Meteor.user().emails[0].address
 
 # Notes template
 Template.notes.truncateNoteDesc = (s) -> s
@@ -46,7 +52,10 @@ Template.editor.events
 # Notifications
 alerts = []
 alertDep = new Deps.Dependency
-errCallback = (err) -> showError msg: err.reason
+errCallback = (err) ->
+  if err.reason
+    showError msg: err.reason
+  else showErrror msg: err
 # Show a notification
 notify = (data) ->
   alerts.push
@@ -75,10 +84,20 @@ Template.error.events 'click .close': -> clearError()
 # "Loading" template
 Template.loading.status = -> Meteor.status()
 
+# Verify Email
+Template.verifyEmail.events
+  'click #btn-verify': (e,template) ->
+    Accounts.verifyEmail template.find('#token-field').value, errCallback
+  'click #btn-resend': ->
+    Meteor.call 'resendConfirmEmail', errCallback
+  'click #btn-delete': -> Meteor.call 'deleteMe'
+  'click #btn-logout': -> Meteor.logout()
+
 # Login and Register
 pressLogin = (template) ->
   mail = template.find('#mail').value; pass = template.find('#pass').value
-  Meteor.loginWithPassword mail, pass, (err) -> errCallback err
+  Meteor.loginWithPassword mail, pass, errCallback
+
 Template.auth.events
   # Login
   'keypress .login': (e,template) -> if e.keyCode is 13 then pressLogin template
@@ -97,6 +116,6 @@ Template.auth.events
         Accounts.createUser {
           email: mail,
           password: pass
-        }, (e) -> errCallback e
+        }, errCallback
       catch err
         showError msg: err
