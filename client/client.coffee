@@ -1,17 +1,18 @@
 # Homework - Client Side
 notes = new Meteor.Collection "notes"
 Deps.autorun -> Meteor.subscribe "my-notes" unless not Meteor.userId()
-validateEmail = (email) ->
-  expr = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
-  expr.test email
+
 getUser = -> Meteor.user()
 amIValid = ->
   return no unless getUser()
   return yes for mail in getUser().emails when mail.verified is yes; no
-# Helpers
+
+# Common Helpers
 UI.registerHelper "loggingIn", -> Meteor.loggingIn()
 UI.registerHelper "mail", -> getUser().emails[0].address
 UI.registerHelper "verified", -> amIValid()
+
+# Client Templates
 
 # User Interface
 Template.userInfo.events

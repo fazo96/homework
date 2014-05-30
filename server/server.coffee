@@ -1,6 +1,9 @@
 # Homework - Server Side
 console.log "Started Homework server!"
-console.log "Sending emails using "+process.env.MAIL_URL
+if process.env.MAIL_URL
+  console.log "Sending emails using "+process.env.MAIL_URL
+else
+  console.log "Not Sending Emails, please set the MAIL_URL environment variable"
 
 notes = new Meteor.Collection "notes"
 
@@ -23,9 +26,11 @@ Accounts.emailTemplates.verifyEmail.text = (user,url) ->
 # Returns true if the user has verified at least one email address
 userValidated = (user) ->
   if not user?
-    throw new Meteor.Exception "Impossible! Trying to validate null user"
+    console.log "Impossible! Trying to validate null user"
+    return no
   return yes for mail in user.emails when mail.verified is yes; no
 
+# Publish user's notes to each user.
 Meteor.publish "my-notes", ->
   if userValidated getUser(@userId)
     notes.find userId: @userId
@@ -39,10 +44,6 @@ Accounts.validateNewUser (user) ->
 
 # Methods that the clients can invoke
 Meteor.methods
-  amIValidated: ->
-    u = getUser(@userId)
-    return no unless u?
-    userValidated u
   resendConfirmEmail: ->
     u = getUser(@userId)
     if not u
