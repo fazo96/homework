@@ -21,9 +21,9 @@ Accounts.config {
 
 Accounts.emailTemplates.siteName = "Homework App";
 Accounts.emailTemplates.verifyEmail.text = (user,url) ->
-  token = url.split('/'); token = token[token.length-1]
-  '''Welcome to Homework! To activate your account, log in then provide the \
-  following token: '''+token
+  urlist = url.split('/'); token = urlist[urlist.length-1]
+  '''Welcome to Homework! To activate your account, click on the \
+  following link: http://homework.meteor.com/verify/'''+token
 
 # Returns true if the user has verified at least one email address
 userValidated = (user) ->

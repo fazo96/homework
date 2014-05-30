@@ -35,10 +35,19 @@ Router.map ->
       if amIValid() is no then Router.go 'verifyEmail'
       if not @data() then Router.go 'notes'
   @route 'verifyEmail',
+    path: '/verify/:token?'
     template: 'verifyEmail'
     onBeforeAction: ->
-      if not getUser() then Router.go 'home'
-      if amIValid() is yes then Router.go 'notes'
+      if @params.token?
+        Accounts.verifyEmail @params.token, (err) ->
+          if err
+            Router.go 'home'
+            errCallback err
+          else Router.go 'notes'
+      else if not getUser()
+        Router.go 'home'
+      else if amIValid() is yes then Router.go 'notes'
+
 
 # Client Templates
 
