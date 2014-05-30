@@ -10,3 +10,4 @@ bootstrap-3
 font-awesome
 accounts-base
 accounts-password
+iron-router

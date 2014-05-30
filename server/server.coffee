@@ -1,4 +1,9 @@
 # Homework - Server Side
+
+validateEmail = (email) ->
+  expr = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
+  expr.test email
+
 console.log "Started Homework server!"
 if process.env.MAIL_URL
   console.log "Sending emails using "+process.env.MAIL_URL
@@ -8,9 +13,6 @@ else
 notes = new Meteor.Collection "notes"
 
 getUser = (id) -> Meteor.users.findOne { _id: id }
-validateEmail = (email) ->
-  expr = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
-  expr.test email
 
 Accounts.config {
   sendVerificationEmail: true
@@ -47,7 +49,7 @@ Meteor.methods
   resendConfirmEmail: ->
     u = getUser(@userId)
     if not u
-      console.log "Validating nonexisting user!!"; return no
+      console.log "Validating nonexisting user!"; return no
     if userValidated(u) is no
       Accounts.sendVerificationEmail @userId
       console.log "Sent verification email to "+u.emails[0].address
@@ -61,3 +63,5 @@ Meteor.methods
       # Automagically log out the user by invalidating every token he has
       Meteor.users.update {_id: @userId},
       {$set : { "resume.loginTokens" : [] } }, { multi: yes }
+      return yes
+    else no

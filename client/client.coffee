@@ -6,29 +6,55 @@ getUser = -> Meteor.user()
 amIValid = ->
   return no unless getUser()
   return yes for mail in getUser().emails when mail.verified is yes; no
+logoutCallback = (err) -> if err then errCallback err else Router.go 'home'
+loginCallback = (err) -> if err then errCallback err else Router.go 'notes'
 
 # Common Helpers
 UI.registerHelper "loggingIn", -> Meteor.loggingIn()
-UI.registerHelper "mail", -> getUser().emails[0].address
+UI.registerHelper "email", -> getUser().emails[0].address
 UI.registerHelper "verified", -> amIValid()
+
+# Router
+Router.configure
+  layoutTemplate: 'layout'
+  loadingTemplate: 'loading'
+Router.map ->
+  @route 'home',
+    onBeforeAction: -> if getUser() then Router.go 'notes'
+    path: '/'
+    template: 'auth'
+  @route 'notes',
+    onBeforeAction: ->
+      if not getUser() then Router.go 'home'
+      if amIValid() is no then Router.go 'verifyEmail'
+  @route 'note',
+    path: '/note/:_id'
+    data: -> notes.findOne _id: @params._id
+    onBeforeAction: ->
+      if not getUser() then Router.go 'home'
+      if amIValid() is no then Router.go 'verifyEmail'
+      if not @data() then Router.go 'notes'
+  @route 'verifyEmail',
+    template: 'verifyEmail'
+    onBeforeAction: ->
+      if not getUser() then Router.go 'home'
+      if amIValid() is yes then Router.go 'notes'
 
 # Client Templates
 
 # User Interface
-Template.userInfo.events
-  'click #logout': (e,template) -> Meteor.logout()
+Template.account.events
+  'click #logout': (e,template) -> Meteor.logout logoutCallback
 
 # Notes template
-Template.notes.truncateNoteDesc = (s) -> s
-  #if s.length > 52 then s.slice(0,48)+"..." else s
-Template.notes.notes = ->
+Template.notelist.empty = -> notes.find().count() is 0
+Template.notelist.notes = ->
   d = notes.find().fetch()
-Template.notes.events
+Template.notelist.events
   'click .close-note': ->
-    if Session.get('note') and Session.get('note')._id is @_id
-      Session.set 'note', undefined
     notes.remove @_id
-  'click .edit-note': -> Session.set 'note', this
+  'click .edit-note': ->
+    Router.go 'note', {_id: @_id}
   'keypress #newNote': (e,template) ->
     if e.keyCode is 13 and template.find('#newNote').value isnt ""
       notes.insert
@@ -38,15 +64,15 @@ Template.notes.events
       template.find('#newNote').value = ""
 
 # Note Editor
-Template.editor.note = -> Session.get 'note'
+Template.editor.note = -> Router.current.data()
 saveCurrentNote = (t,e) ->
   if e and e.keyCode isnt 13 then return;
-  notes.update Session.get('note')._id,
+  notes.update Router.current().data()._id,
     $set:
       title: t.find('.editor-title').value
       content: t.find('.area').value
 Template.editor.events
-  'click .close-editor': -> Session.set 'note', undefined
+  'click .close-editor': -> Router.go 'notes'
   'click .save-editor': (e,t) -> saveCurrentNote t
   'keypress .title': (e,t) -> saveCurrentNote t, e
 
@@ -82,22 +108,24 @@ clearError = -> shownError = undefined; errorDep.changed()
 Template.error.error = -> errorDep.depend(); shownError
 Template.error.events 'click .close': -> clearError()
 
-# "Loading" template
-Template.loading.status = -> Meteor.status()
-
 # Verify Email
 Template.verifyEmail.events
   'click #btn-verify': (e,template) ->
-    Accounts.verifyEmail template.find('#token-field').value, errCallback
+    Accounts.verifyEmail template.find('#token-field').value, (err) ->
+      if err then errCallback err else Router.go 'notes'
   'click #btn-resend': ->
-    Meteor.call 'resendConfirmEmail', errCallback
-  'click #btn-delete': -> Meteor.call 'deleteMe'
-  'click #btn-logout': -> Meteor.logout()
+    Meteor.call 'resendConfirmEmail', (err) ->
+      if err
+        errCallback err
+      else showError { type:"success", msg: "Confirmation email sent" }
+  'click #btn-delete': ->
+    Meteor.call 'deleteMe', (r) -> if r is yes then Router.go 'home'
+  'click #btn-logout': -> Meteor.logout logoutCallback
 
 # Login and Register
 pressLogin = (template) ->
   mail = template.find('#mail').value; pass = template.find('#pass').value
-  Meteor.loginWithPassword mail, pass, errCallback
+  Meteor.loginWithPassword mail, pass, loginCallback
 
 Template.auth.events
   # Login
@@ -117,6 +145,6 @@ Template.auth.events
         Accounts.createUser {
           email: mail,
           password: pass
-        }, errCallback
+        }, (err) -> if err then errCallback err else Router.go 'confirmEmail'
       catch err
         showError msg: err

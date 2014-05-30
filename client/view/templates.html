@@ -1,9 +1,5 @@
-<head>
-  <title>Homework</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-</head>
-<body>
-  {{> ribbon}}
+<!-- Homework UI Templates -->
+<template name="layout">
   <div class="container">
     <div class="page-header">
       <h1 id="title">Homework<br>
@@ -12,21 +8,27 @@
     </div>
     <div class="center-block" id="ui-container">
       {{> error}}
-      {{#if currentUser}}
-        {{#if verified}}
-          {{> editor}} {{> notes}} {{> userInfo}}
-        {{else}}
-          {{> verifyEmail}}
-        {{/if}}
-      {{else}}
-        {{> auth}}
-      {{/if}}
+      {{> yield}}
     </div>
     <div class="center-block" align="center">{{> footer}}</div>
   </div>
-</body>
+  {{> ribbon}}
+</template>
 
 <template name="notes">
+  {{> notelist }} <hr> {{> account }}
+</template>
+<template name="note">
+  {{> editor }} {{> notelist }} <hr> {{> account }}
+</template>
+
+<template name="noteadder">
+  <div align="center">
+    <input type="text" id="newNote" class="form-control" placeholder="Add new note">
+  </div>
+</template>
+
+<template name="notelist">
   <ul class="list-group">
     {{#each notes}}
     <li class="note list-group-item">
@@ -40,9 +42,10 @@
     </li>
     {{/each}}
   </ul>
-  <div align="center">
-    <input type="text" id="newNote" class="form-control" placeholder="Add new note">
-  </div>
+  {{#if empty}}
+    <p align="center">You don't have any notes, try adding a new one</p>
+  {{/if}}
+  {{> noteadder }}
 </template>
 
 <template name="auth">
@@ -56,14 +59,14 @@
       <br>
     {{/if}}
     <p>Password must be at least 8 characters. Email must be a valid email</p>
-    {{#unless working}}
+    {{#unless loggingIn}}
       <button type="button" id="register" class="btn-auth btn btn-success">Register</button>
       <button type="button" id="login" class="btn-auth btn btn-primary">Login</button>
     {{/unless}}
   </div>
 </template>
 
-<template name="userInfo"><hr>
+<template name="account">
   {{#if loggingIn}} {{> loading}} {{/if}}
   <div align="center">
     <p>{{email}}</p>
@@ -86,18 +89,18 @@
 
 <template name="editor">
   <div align="center">{{> error }}</div>
-  {{#if note}}
+  {{#if _id}}
   <div class="panel panel-info">
     <div class="panel-heading">
       <h3 class="panel-title">
         <div align="center">
-          <input type="text" class="form-control editor-title" value="{{note.title}}" placeholder="Title">
+          <input type="text" class="form-control editor-title" value="{{title}}" placeholder="Title">
           <button type="button" class="close close-editor">&times;</button>
         </div>
       </h3>
     </div>
     <div align="center" class="panel-body">
-      <textarea class="area form-control" rows="3" placeholder="...">{{note.content}}</textarea>
+      <textarea class="area form-control" rows="3" placeholder="...">{{content}}</textarea>
       <button type="button" class="btn btn-info save-editor">Save</button>
     </div>
   </div>
