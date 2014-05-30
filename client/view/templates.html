@@ -29,9 +29,9 @@
 </template>
 
 <template name="notelist">
-  <ul class="list-group">
+  <div class="list-group">
     {{#each notes}}
-    <li class="note list-group-item">
+    <a href="{{pathFor 'note'}}" class="note list-group-item">
       <span class="note-content">
         <button type="button" class="edit-note close">
           <i class="fa fa-pencil-square-o"></i>
@@ -39,9 +39,9 @@
         <b>{{title}}</b> <span class="note-desc">{{content}}</span>
       </span>
       <button type="button" class="close-note close">&times;</button>
-    </li>
+    </a>
     {{/each}}
-  </ul>
+  </div>
   {{#if empty}}
     <p align="center">You don't have any notes, try adding a new one</p>
   {{/if}}
@@ -100,7 +100,7 @@
       </h3>
     </div>
     <div align="center" class="panel-body">
-      <textarea class="area form-control" rows="3" placeholder="...">{{content}}</textarea>
+      <textarea id="area" class="area form-control" rows="3" placeholder="...">{{content}}</textarea>
       <button type="button" class="btn btn-info save-editor">Save</button>
     </div>
   </div>

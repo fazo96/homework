@@ -73,7 +73,7 @@ Template.notelist.events
       template.find('#newNote').value = ""
 
 # Note Editor
-Template.editor.note = -> Router.current.data()
+Template.editor.note = -> Router.current.data() # Only when we're in /note/:_id
 saveCurrentNote = (t,e) ->
   if e and e.keyCode isnt 13 then return;
   notes.update Router.current().data()._id,
