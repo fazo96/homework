@@ -15,6 +15,10 @@ input {
 .custom-link { color: #999; }
 .custom-link:hover { color: #101010;}
 
+.menu-item {
+  margin-right: 100px; margin-left:100px;
+}
+
 .note {
   padding-bottom: 5px;
 }

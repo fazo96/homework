@@ -1,13 +1,10 @@
 # Homework - Client Side
 notes = new Meteor.Collection "notes"
-Deps.autorun -> Meteor.subscribe "my-notes" unless not Meteor.userId()
-
 getUser = -> Meteor.user()
+myNotes = -> Meteor.subscribe "my-notes"
 amIValid = ->
   return no unless getUser()
   return yes for mail in getUser().emails when mail.verified is yes; no
-logoutCallback = (err) -> if err then errCallback err else Router.go 'home'
-loginCallback = (err) -> if err then errCallback err else Router.go 'notes'
 
 # Common Helpers
 UI.registerHelper "loggingIn", -> Meteor.loggingIn()
@@ -18,22 +15,23 @@ UI.registerHelper "verified", -> amIValid()
 Router.configure
   layoutTemplate: 'layout'
   loadingTemplate: 'loading'
+  notFoundTemplate: '404'
 Router.map ->
   @route 'home',
-    onBeforeAction: -> if getUser() then Router.go 'notes'
+    onBeforeAction: (pause)->
+      if getUser()
+        if amIValid() is yes then Router.go 'notes' else Router.go 'verifyEmail'
     path: '/'
     template: 'auth'
   @route 'notes',
+    waitOn: -> Meteor.subscribe "my-notes"
     onBeforeAction: ->
       if not getUser() then Router.go 'home'
-      if amIValid() is no then Router.go 'verifyEmail'
   @route 'note',
     path: '/note/:_id'
+    waitOn: -> Meteor.subscribe "my-notes"
     data: -> notes.findOne _id: @params._id
-    onBeforeAction: ->
-      if not getUser() then Router.go 'home'
-      if amIValid() is no then Router.go 'verifyEmail'
-      if not @data() then Router.go 'notes'
+    onBeforeAction: -> if not @data()? then Router.go 'home'
   @route 'verifyEmail',
     path: '/verify/:token?'
     template: 'verifyEmail'
@@ -47,23 +45,26 @@ Router.map ->
       else if not getUser()
         Router.go 'home'
       else if amIValid() is yes then Router.go 'notes'
+  @route '404', path: '*'
 
+logoutCallback = (err) -> if err then errCallback err else Router.go 'home'
 
 # Client Templates
+# Menu
+Template.menu.at_home = ->
+  if Router.current() then return "active" if Router.current().path is "/notes"
 
 # User Interface
 Template.account.events
-  'click #logout': (e,template) -> Meteor.logout logoutCallback
+  'click #btn-logout': (e,template) -> Meteor.logout logoutCallback
 
 # Notes template
 Template.notelist.empty = -> notes.find().count() is 0
 Template.notelist.notes = ->
   d = notes.find().fetch()
 Template.notelist.events
-  'click .close-note': ->
-    notes.remove @_id
-  'click .edit-note': ->
-    Router.go 'note', {_id: @_id}
+  'click .close-note': -> notes.remove @_id
+  'click .edit-note': -> Router.go 'note', {_id: @_id}
   'keypress #newNote': (e,template) ->
     if e.keyCode is 13 and template.find('#newNote').value isnt ""
       notes.insert
@@ -134,7 +135,7 @@ Template.verifyEmail.events
 # Login and Register
 pressLogin = (template) ->
   mail = template.find('#mail').value; pass = template.find('#pass').value
-  Meteor.loginWithPassword mail, pass, loginCallback
+  Meteor.loginWithPassword mail, pass, errCallback
 
 Template.auth.events
   # Login

@@ -3,21 +3,31 @@
   <div class="container">
     <div class="page-header">
       <h1 id="title">Homework<br>
-        <small id="small">management for students</small>
+        <small>management for students</small>
       </h1>
     </div>
     <div class="center-block" id="ui-container">
       {{> error}}
       {{> yield}}
     </div>
+    <hr>
     <div class="center-block" align="center">{{> footer}}</div>
   </div>
   {{> ribbon}}
 </template>
 
+<template name="menu">
+  <ul class="nav nav-pills nav-justified">
+    <li class="menu-item {{at_archive}}"><a href="/archive">Archive</a></li>
+    <li class="menu-item {{at_home}}"><a href="/notes">Home</a></li>
+    <li class="menu-item {{at_account}}"><a href="/account">Account</a></li>
+  </ul>
+</template>
+
 <template name="notes">
   {{> notelist }} <hr> {{> account }}
 </template>
+
 <template name="note">
   {{> editor }} {{> notelist }} <hr> {{> account }}
 </template>
@@ -70,7 +80,7 @@
   {{#if loggingIn}} {{> loading}} {{/if}}
   <div align="center">
     <p>{{email}}</p>
-    <button type="button" id="logout" class="btn btn-danger">Logout</button>
+    <button type="button" id="btn-logout" class="btn btn-danger">Logout</button>
   </div>
 </template>
 
@@ -140,10 +150,15 @@
 </template>
 
 <template name="footer">
-  <hr>
   <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
   <p>Built by Enrico Fasoli as a prototype.<br><u>Not ready for daily usage yet!</u></p>
   <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
   <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
   <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
+</template>
+
+<template name="404">
+  <div align="center">
+    <h2>Acciderbolina!<br><small>Page not found</small></h2>
+  </div>
 </template>
