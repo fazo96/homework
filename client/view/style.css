@@ -1,6 +1,7 @@
 /* Generics and bootstrap classes */
 input {
   text-align:center;
+  max-width: 400px;
 }
 
 .page-header {
@@ -15,8 +16,20 @@ input {
 .custom-link { color: #999; }
 .custom-link:hover { color: #101010;}
 
+.cool-header {
+  margin-bottom: 22px;
+}
+
+.btns-account {
+  margin-top: 20px;
+}
+
 .menu-item {
   margin-right: 100px; margin-left:100px;
+}
+
+.in-bt {
+  margin-bottom: 10px;
 }
 
 .note {
@@ -71,7 +84,7 @@ input {
   margin-top: 10px;
 }
 
-.btn-auth {
+.btn-fix {
   width: 100px;
 }
 
@@ -104,9 +117,5 @@ input {
 
 #newNote {
   max-width: 250px;
-  margin-bottom: 10px;
-}
-
-#mail {
   margin-bottom: 10px;
 }

@@ -1,4 +1,5 @@
 <!-- Homework UI Templates -->
+
 <template name="layout">
   <div class="container">
     <div class="page-header">
@@ -7,7 +8,6 @@
       </h1>
     </div>
     <div class="center-block" id="ui-container">
-      {{> error}}
       {{> yield}}
     </div>
     <hr>
@@ -17,20 +17,22 @@
 </template>
 
 <template name="menu">
-  <ul class="nav nav-pills nav-justified">
-    <li class="menu-item {{at_archive}}"><a href="/archive">Archive</a></li>
-    <li class="menu-item {{at_home}}"><a href="/notes">Home</a></li>
-    <li class="menu-item {{at_account}}"><a href="/account">Account</a></li>
-  </ul>
+  <div align="center" class="menu-container">
+  <div class="btn-group">
+    <button type="button" class="btn btn-success go-archive">
+      <i class="fa fa-book fa-inverse"></i> Archive
+    </button>
+    <button type="button" class="btn btn-primary go-home">
+      <i class="fa fa-home fa-inverse"></i> Home
+    </button>
+    <button type="button" class="btn btn-warning go-account">
+      <i class="fa fa-user fa-inverse"></i> Account
+    </button>
+  </div></div>
 </template>
 
-<template name="notes">
-  {{> notelist }} <hr> {{> account }}
-</template>
-
-<template name="note">
-  {{> editor }} {{> notelist }} <hr> {{> account }}
-</template>
+<template name="notes">{{> error }} {{> notelist }} {{> menu}}</template>
+<template name="note">{{> error }} {{> editor }} {{> notelist }} <hr> {{> menu}}</template>
 
 <template name="noteadder">
   <div align="center">
@@ -58,35 +60,59 @@
   {{> noteadder }}
 </template>
 
-<template name="auth">
+<template name="login">
   <div align="center">
-    <p>Register a new Account or login</p>
+    <h3 class="cool-header"><i class="fa fa-sign-in fa-2x"></i><br>Login</h3>
+    {{> error}}
     {{#if loggingIn}}
       {{> loading}}
     {{else}}
-      <input type="text" id="mail" class="form-control login" placeholder="Email">
-      <input type="password" id="pass" class="form-control login" placeholder="Password">
-      <br>
+      <input type="text" id="l-mail" class="form-control login in-bt" placeholder="Email">
+      <input type="password" id="l-pass" class="form-control login in-bt" placeholder="Password">
     {{/if}}
-    <p>Password must be at least 8 characters. Email must be a valid email</p>
     {{#unless loggingIn}}
-      <button type="button" id="register" class="btn-auth btn btn-success">Register</button>
-      <button type="button" id="login" class="btn-auth btn btn-primary">Login</button>
+      <a role="button" href="{{pathFor 'register'}}" class="btn-fix btn btn-success">Register</a>
+      <a role="button" id="login-btn" class="btn-fix btn btn-primary">Login</a>
     {{/unless}}
   </div>
 </template>
 
-<template name="account">
-  {{#if loggingIn}} {{> loading}} {{/if}}
+<template name="register">
   <div align="center">
-    <p>{{email}}</p>
-    <button type="button" id="btn-logout" class="btn btn-danger">Logout</button>
+    <h3 class="cool-header"><i class="fa fa-user fa-2x"></i><br>New Account</h3>
+    {{#if loggingIn}}
+      {{> loading}}
+    {{else}}
+      <p>Password must be at least 8 characters. You will need to confirm your email.</p>
+      {{> error}}
+      <input type="text" id="r-mail" class="form-control register in-bt" placeholder="Email">
+      <input type="password" id="r-pass" class="form-control register in-bt" placeholder="Password">
+      <input type="password" id="r-pass-2" class="form-control register pass-rep in-bt" placeholder="Repeat Password">
+      <button type="button" id="register-btn" class="btn-fix btn btn-primary">Create</button>
+      <a role="button" href="{{pathFor 'home'}}" class="btn-fix btn btn-success">Home</a>
+    {{/if}}
+  </div>
+</template>
+
+<template name="account">
+  <div align="center">
+    <h3 class="cool-header"><i class="fa fa-user fa-2x"></i><br>{{email}}</h3>
+    {{> menu}}
+    <div class="btn-group btns-account">
+      <button type="button" id="btn-logout" class="btn btn-warning">
+        <i class="fa fa-sign-out fa-inverse"></i> Logout
+      </button>
+      <button type="button" id="btn-delete-me" class="btn btn-danger">
+        <i class="fa fa-exclamation-circle fa-inverse"></i> Delete
+      </button>
+    </div>
   </div>
 </template>
 
 <template name="verifyEmail">
   <div align="center">
     <p>Insert the token you received by email at the address {{email}} here, or click the link in the email we sent you.</p>
+    {{> error}}
     <input type="text" id="token-field" class="form-control" placeholder="Token">
     <div align="center" class="buttons">
       <button type="button" class="btn btn-warning btn-ver" id="btn-resend">Resend Email</button>
@@ -98,7 +124,6 @@
 </template>
 
 <template name="editor">
-  <div align="center">{{> error }}</div>
   {{#if _id}}
   <div class="panel panel-info">
     <div class="panel-heading">
@@ -118,29 +143,29 @@
 </template>
 
 <template name="notifications">
-{{#each notification}}
-  <div class="alert alert-{{type}} notification">
-    <p align="center">{{msg}}</p>
-    <button type="button" class="close close-notification">&times;</button>
-  </div>
-{{/each}}
+  {{#each notification}}
+    <div class="alert alert-{{type}} notification">
+      <p align="center">{{msg}}</p>
+      <button type="button" class="close close-notification">&times;</button>
+    </div>
+  {{/each}}
 </template>
 
 <template name="error">
-{{#if error}}
-  <div align="center"><div class="alert alert-{{error.type}} error">
-    <p align="center">{{error.msg}}</p>
-    <button type="button" class="close close-error">&times;</button>
-  </div></div>
-{{/if}}
+  {{#if error}}
+    <div align="center"><div class="alert alert-{{error.type}} error">
+      <p align="center">{{error.msg}}</p>
+      <button type="button" class="close close-error">&times;</button>
+    </div></div>
+  {{/if}}
 </template>
 
 <template name="ribbon">
-<div class="github-fork-ribbon-wrapper right">
-  <div class="github-fork-ribbon">
-    <a href="http://github.com/fazo96/homework">Fork me on GitHub</a>
+  <div class="github-fork-ribbon-wrapper right">
+    <div class="github-fork-ribbon">
+      <a href="http://github.com/fazo96/homework">Fork me on GitHub</a>
+    </div>
   </div>
-</div>
 </template>
 
 <template name="loading">
@@ -159,6 +184,7 @@
 
 <template name="404">
   <div align="center">
-    <h2>Acciderbolina!<br><small>Page not found</small></h2>
+    <h2><i class="fa fa-exclamation-triangle fa-2x"></i><br>
+      Acciderbolina!<br><small>Page not found</small></h2>
   </div>
 </template>

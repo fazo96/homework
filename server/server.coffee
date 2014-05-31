@@ -1,9 +1,5 @@
 # Homework - Server Side
-
-validateEmail = (email) ->
-  expr = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/
-  expr.test email
-
+notes = share.notes
 console.log "Started Homework server!"
 if process.env.MAIL_URL
   console.log "Sending emails using "+process.env.MAIL_URL
@@ -13,17 +9,6 @@ else
 notes = new Meteor.Collection "notes"
 
 getUser = (id) -> Meteor.users.findOne { _id: id }
-
-Accounts.config {
-  sendVerificationEmail: true
-  loginExpirationInDays: 1
-}
-
-Accounts.emailTemplates.siteName = "Homework App";
-Accounts.emailTemplates.verifyEmail.text = (user,url) ->
-  urlist = url.split('/'); token = urlist[urlist.length-1]
-  '''Welcome to Homework! To activate your account, click on the \
-  following link: http://homework.meteor.com/verify/'''+token
 
 # Returns true if the user has verified at least one email address
 userValidated = (user) ->
@@ -36,13 +21,6 @@ userValidated = (user) ->
 Meteor.publish "my-notes", ->
   if userValidated getUser(@userId)
     notes.find userId: @userId
-
-# Authentication
-Accounts.validateNewUser (user) ->
-  mail = user.emails[0].address
-  if Match.test(mail,String) is no or validateEmail(mail) is no
-    throw new Meteor.Error 403, "Invalid Email"
-  return yes
 
 # Methods that the clients can invoke
 Meteor.methods
