@@ -11,7 +11,8 @@ amIValid = ->
 
 # Common Helpers for the Templates
 UI.registerHelper "loggingIn", -> Meteor.loggingIn()
-UI.registerHelper "email", -> getUser().emails[0].address
+UI.registerHelper "email", ->
+  if getUser() then return getUser().emails[0].address
 UI.registerHelper "verified", -> amIValid()
 
 # Router
@@ -29,12 +30,12 @@ Router.configure
   notFoundTemplate: '404'
 Router.map ->
   @route 'home',
+    path: '/'
     onBeforeAction: ->
       # Dispatch user to the right landing page based on his account status
       if getUser()
         if amIValid() is yes then Router.go 'notes' else Router.go 'verifyEmail'
       else Router.go 'login'
-    path: '/'
   @route 'login',
     onBeforeAction: -> Router.go 'home' if getUser()
   @route 'register',
@@ -55,10 +56,18 @@ Router.map ->
     path: '/verify/:token?'
     template: 'verifyEmail'
     onBeforeAction: ->
-      if @params.token?
+      if @params.token? and @params.token isnt ""
         Accounts.verifyEmail @params.token, (err) ->
-          if err then errCallback err else Router.go 'home'
+          if err
+            errCallback err; Router.go 'verifyEmail'
+          else Router.go 'home'
   @route '404', path: '*'
+
+# You can't set a callback for when the user logs in using a cookie so...
+# Cheap ass work around for routing the user after he logs in with a token
+Deps.autorun ->
+  t = Router.current(); return unless t and t.lookupTemplate
+  if getUser() and t.lookupTemplate() is 'login' then Router.go 'home'
 
 # Client Templates
 
@@ -78,6 +87,7 @@ Template.menu.events
 # User Interface
 Template.account.events
   'click #btn-logout': (e,template) -> Meteor.logout logoutCallback
+  'click #btn-delete-me': -> deleteAccount()
 
 # Notes template
 Template.notelist.empty = -> notes.find().count() is 0
@@ -138,7 +148,10 @@ Template.error.events 'click .close': -> clearError()
 # Verify Email
 Template.verifyEmail.events
   'click #btn-verify': (e,template) ->
-    Accounts.verifyEmail template.find('#token-field').value, (err) ->
+    t = template.find('#token-field').value; t = t.split("/")
+    t = t[t.length-1] # Remove all the part before the last "/"
+    console.log "Email ver. using token: "+template.find('#token-field').value
+    Accounts.verifyEmail t, (err) ->
       if err then errCallback err else Router.go 'notes'
   'click #btn-resend': ->
     Meteor.call 'resendConfirmEmail', (err) ->
@@ -153,7 +166,7 @@ loginRequest = (e,template) ->
   if e and e.keyCode isnt 13 then return
   mail = template.find('#l-mail').value; pass = template.find('#l-pass').value
   Meteor.loginWithPassword mail, pass, (err) ->
-    if err then errCallback err else Router.go 'home'
+    if err then errCallback err else Router.go 'notes'
 
 Template.login.events
   'keypress .login': (e,template) -> loginRequest e,template

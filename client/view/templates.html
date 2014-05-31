@@ -19,7 +19,7 @@
 <template name="menu">
   <div align="center" class="menu-container">
   <div class="btn-group">
-    <button type="button" class="btn btn-success go-archive">
+    <button type="button" disabled="disabled" class="btn btn-success go-archive">
       <i class="fa fa-book fa-inverse"></i> Archive
     </button>
     <button type="button" class="btn btn-primary go-home">
@@ -111,12 +111,14 @@
 
 <template name="verifyEmail">
   <div align="center">
-    <p>Insert the token you received by email at the address {{email}} here, or click the link in the email we sent you.</p>
+    <h3 class="cool-header"><i class="fa fa-envelope fa-2x"></i><br>
+      Please verify your Email Address<br><small>{{email}}</small></h3>
+    <p>Click the link inside the email we sent you or paste it here:</p>
     {{> error}}
     <input type="text" id="token-field" class="form-control" placeholder="Token">
     <div align="center" class="buttons">
       <button type="button" class="btn btn-warning btn-ver" id="btn-resend">Resend Email</button>
-      <button type="button" class="btn btn-success btn-ver" id="btn-verify">Verify Email</button>
+      <button type="button" class="btn btn-success btn-ver" id="btn-verify">Verify Token</button>
       <button type="button" class="btn btn-danger btn-ver" id="btn-delete">Delete Account</button>
       <br><button type="button" class="btn btn-primary btn-ver" id="btn-logout">Logout</button>
     </div>
