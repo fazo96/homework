@@ -1,12 +1,20 @@
 # Homework
-Schoolwork management application for students.
+Schoolwork management application for students. Built using
+[Meteor](http://gihub.com/meteor/meteor), a Web App framework on top of Node.js
+and MongoDB.
+
+I built this because I felt like the other apps didn't do it very well.
+Also, I learnt a lot and had fun!
 
 ### Try it
 [the app is hosted online!](http://homework.meteor.com)
 
 ### Development
 Clone the repo, [install meteor](http://meteor.com) and **meteorite**.
-Install dependent packages and then run `meteor`. That's it.
+Install dependent packages with `mrt install` and then run `meteor`. That's it.
+If you want to send emails (necessary to confirm users) you need to set the
+`MAIL_URL` environment variable, or else the emails will be printed on stdout.
+
 
 ### License
 The MIT License (MIT)

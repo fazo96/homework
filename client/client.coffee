@@ -33,11 +33,11 @@ Router.configure
 Router.map ->
   @route 'home',
     path: '/'
+    action: -> @render 'homepage', to: 'outside'
     onBeforeAction: ->
       # Dispatch user to the right landing page based on his account status
       if getUser()
         if amIValid() is yes then Router.go 'notes' else Router.go 'verifyEmail'
-      else Router.go 'login'
   @route 'login',
     onBeforeAction: -> Router.go 'home' if getUser()
   @route 'register',
@@ -61,6 +61,7 @@ Router.map ->
           if err
             errCallback err; Router.go 'verifyEmail'
           else Router.go 'home'
+  @route 'homepage', action: -> @render '404'
   @route '404', path: '*'
 
 # You can't set a callback for when the user logs in using a cookie so...

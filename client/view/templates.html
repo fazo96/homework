@@ -7,6 +7,7 @@
         <small>management for students</small>
       </h1>
     </div>
+    {{> yield region='outside'}}
     <div class="center-block" id="ui-container">
       {{> yield}}
     </div>
@@ -83,7 +84,7 @@
 
 <template name="login">
   <div align="center">
-    <h3 class="cool-header"><i class="fa fa-sign-in fa-2x"></i><br>Login</h3>
+    <h3 class="cool-header"><i class="fa fa-sign-in fa-2x"></i><br>Sign In</h3>
     {{> error}}
     {{#if loggingIn}}
       {{> loading}}
@@ -92,8 +93,12 @@
       <input type="password" id="l-pass" class="form-control login in-bt" placeholder="Password">
     {{/if}}
     {{#unless loggingIn}}
-      <a role="button" href="{{pathFor 'register'}}" class="btn-fix btn btn-success">Register</a>
-      <a role="button" id="login-btn" class="btn-fix btn btn-primary">Login</a>
+      <a role="button" href="{{pathFor 'register'}}" class="btn-fix btn btn-success">
+        <i class="fa fa-user"></i> Sign Up</a>
+      <a role="button" id="login-btn" class="btn-fix btn btn-primary">
+        Log In</a>
+      <a role="button" href="{{pathFor 'home'}}" class="btn-fix btn btn-warning">
+        <i class="fa fa-home"></i> Home</a>
     {{/unless}}
   </div>
 </template>
@@ -109,8 +114,10 @@
       <input type="text" id="r-mail" class="form-control register in-bt" placeholder="Email">
       <input type="password" id="r-pass" class="form-control register in-bt" placeholder="Password">
       <input type="password" id="r-pass-2" class="form-control register pass-rep in-bt" placeholder="Repeat Password">
-      <button type="button" id="register-btn" class="btn-fix btn btn-primary">Create</button>
-      <a role="button" href="{{pathFor 'home'}}" class="btn-fix btn btn-success">Home</a>
+      <button type="button" id="register-btn" class="btn-fix btn btn-primary">
+        <i class="fa fa-user"></i> Sign Up</button>
+      <a role="button" href="{{pathFor 'home'}}" class="btn-fix btn btn-success">
+        <i class="fa fa-home"></i> Home</a>
     {{/if}}
   </div>
 </template>
@@ -121,7 +128,7 @@
     {{> menu}}
     <div class="btn-group btns-account">
       <button type="button" id="btn-logout" class="btn btn-warning">
-        <i class="fa fa-sign-out fa-inverse"></i> Logout
+        <i class="fa fa-sign-out fa-inverse"></i> Sign Out
       </button>
       <button type="button" id="btn-delete-me" class="btn btn-danger">
         <i class="fa fa-exclamation-circle fa-inverse"></i> Delete
@@ -141,7 +148,7 @@
       <button type="button" class="btn btn-warning btn-ver" id="btn-resend">Resend Email</button>
       <button type="button" class="btn btn-success btn-ver" id="btn-verify">Verify Token</button>
       <button type="button" class="btn btn-danger btn-ver" id="btn-delete">Delete Account</button>
-      <br><button type="button" class="btn btn-primary btn-ver" id="btn-logout">Logout</button>
+      <br><button type="button" class="btn btn-primary btn-ver" id="btn-logout">Sign Out</button>
     </div>
   </div>
 </template>
@@ -180,7 +187,7 @@
 
 <template name="footer">
   <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
-  <p>Built by Enrico Fasoli as a prototype.<br><u>Not ready for daily usage yet!</u></p>
+  <p>Built by Enrico Fasoli</p>
   <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
   <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
   <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
@@ -188,7 +195,42 @@
 
 <template name="404">
   <div align="center">
-    <h2><i class="fa fa-exclamation-triangle fa-2x"></i><br>
-      Acciderbolina!<br><small>Page not found</small></h2>
+    <h1><i class="fa fa-exclamation-triangle fa-2x"></i><br>
+      404<br><small>Page not found</small></h1>
+    <a style="margin-top:15px" role="button" class="btn btn-success" href="{{pathFor 'home'}}">
+      <i class="fa fa-home"></i> Home
+    </a>
   </div>
+</template>
+
+<template name="homepage">
+  <div align="center"><i class="fa fa-book fa-5x"></i></div>
+  <p align="center" style="margin-top: 20px" class="lead">A fast, free, organized way to manage your school tasks.</p>
+  {{#if loggingIn}}{{> loading}} {{/if}}
+  <div class="row" align="center">
+    <div class="col-sm-4">
+      <h2><i class="fa fa-code-fork"></i> Free.
+      <small>This app is not only <u>free of charge and ads</u>, it's also <b>Free Software</b>.
+      Anyone can <a href="http://github.com/fazo96/homework">see the code</a> and contribute.
+      </small></h2>
+    </div>
+    <div class="col-sm-4">
+      <h2><i class="fa fa-check"></i> Simple.
+      <small>Just what you need: a homework list organized by date. Nothing more, nothing less.</small></h2>
+    </div>
+    <div class="col-sm-4">
+      <h2><i class="fa fa-bolt"></i> Modern.
+      <small>Works on all modern <u>Mobile</u> and <u>Desktop</u> browsers.
+      Your password is safe and <u>not</u> stored online.</small></h2></div>
+  </div>
+  {{#unless loggingIn}}
+  <div align="center" style="margin-top:20px;">
+    <a href="{{pathFor 'login'}}" role="button" class="btn btn-primary">
+      <i class="fa fa-sign-in"></i> Sign In
+    </a>
+    <a href="{{pathFor 'register'}}" role="button" class="btn btn-success">
+      <i class="fa fa-user"></i> Sign Up
+    </a>
+  </div>
+  {{/unless}}
 </template>
