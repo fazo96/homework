@@ -20,6 +20,10 @@ input {
   margin-bottom: 22px;
 }
 
+.date {
+  max-width: 250px;
+}
+
 .btns-account {
   margin-top: 20px;
 }
@@ -47,8 +51,12 @@ input {
 .close-note {
   float: right;
   margin-top: -2px;
+  clear:both;
 }
-
+.note-date{
+  float:right;
+  margin-top: -17px;
+}
 .note-desc {
   color: #999;
 }

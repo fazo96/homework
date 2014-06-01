@@ -12,15 +12,16 @@ getUser = (id) -> Meteor.users.findOne { _id: id }
 
 # Returns true if the user has verified at least one email address
 userValidated = (user) ->
-  if not user?
-    console.log "Impossible! Trying to validate null user"
-    return no
+  return no unless user?
   return yes for mail in user.emails when mail.verified is yes; no
 
 # Publish user's notes to each user.
 Meteor.publish "my-notes", ->
   if userValidated getUser(@userId)
-    notes.find userId: @userId
+    notes.find userId: @userId, archived: no
+Meteor.publish "archive", ->
+  if userValidated getUser(@userId)
+    notes.find userId: @userId, archived: yes
 
 # Methods that the clients can invoke
 Meteor.methods

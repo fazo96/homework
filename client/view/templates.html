@@ -45,10 +45,11 @@
     {{#each notes}}
     <a href="{{pathFor 'note'}}" class="note list-group-item">
       <span class="note-content">
-        <button type="button" class="edit-note close">
+        {{#if active}}<a role="button" href="{{pathFor 'notes'}}" class="edit-note close">
           <i class="fa fa-pencil-square-o"></i>
-        </button>
+        </a>{{/if}}
         <b>{{title}}</b> <span class="note-desc">{{content}}</span>
+        <span class="note-date label label-{{getDate.color}}">{{getDate.msg}}</span>
       </span>
       <button type="button" class="close-note close">&times;</button>
     </a>
@@ -58,6 +59,26 @@
     <p align="center">You don't have any notes, try adding a new one</p>
   {{/if}}
   {{> noteadder }}
+</template>
+
+<template name="editor">
+  {{#if _id}}
+  <div class="panel panel-info">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        <div align="center">
+          <input type="text" class="form-control editor-title" value="{{title}}" placeholder="Title">
+          <button type="button" class="close close-editor">&times;</button>
+        </div>
+      </h3>
+    </div>
+    <div align="center" class="panel-body">
+      <textarea id="area" class="area form-control in-bt" rows="3" placeholder="...">{{content}}</textarea>
+      <input class="form-control date" value="{{date}}" placeholder="Due Date">
+      <button type="button" class="btn btn-info save-editor">Save</button>
+    </div>
+  </div>
+  {{/if}}
 </template>
 
 <template name="login">
@@ -123,25 +144,6 @@
       <br><button type="button" class="btn btn-primary btn-ver" id="btn-logout">Logout</button>
     </div>
   </div>
-</template>
-
-<template name="editor">
-  {{#if _id}}
-  <div class="panel panel-info">
-    <div class="panel-heading">
-      <h3 class="panel-title">
-        <div align="center">
-          <input type="text" class="form-control editor-title" value="{{title}}" placeholder="Title">
-          <button type="button" class="close close-editor">&times;</button>
-        </div>
-      </h3>
-    </div>
-    <div align="center" class="panel-body">
-      <textarea id="area" class="area form-control" rows="3" placeholder="...">{{content}}</textarea>
-      <button type="button" class="btn btn-info save-editor">Save</button>
-    </div>
-  </div>
-  {{/if}}
 </template>
 
 <template name="notifications">

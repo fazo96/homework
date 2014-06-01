@@ -4,7 +4,8 @@
     "basePackages": {
       "bootstrap-3": {},
       "font-awesome": {},
-      "iron-router": {}
+      "iron-router": {},
+      "bootstrap3-datepicker": {}
     },
     "packages": {
       "bootstrap-3": {
@@ -21,6 +22,11 @@
         "git": "https://github.com/EventedMind/iron-router.git",
         "tag": "v0.7.1",
         "commit": "d1ffb3f06ea4c112132b030f2eb1a70b81675ecb"
+      },
+      "bootstrap3-datepicker": {
+        "git": "https://github.com/rajit/bootstrap3-datepicker.git",
+        "tag": "v0.2.1",
+        "commit": "442484eb1c8eb00c6b9e0e9c88accc934cf8f04a"
       },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",

@@ -8,6 +8,10 @@ deleteAccount = ->
 amIValid = ->
   return no unless getUser()
   return yes for mail in getUser().emails when mail.verified is yes; no
+daysUntil = (time) ->
+  date = new Date time; now = new Date() #console.log date+" "+now
+  now.setHours(0); now.setMinutes(0); now.setSeconds(0)
+  (Math.floor ((date.getTime() - now.getTime()) / 1000 / 60 / 60) + 1) / 24
 
 # Common Helpers for the Templates
 UI.registerHelper "loggingIn", -> Meteor.loggingIn()
@@ -17,12 +21,10 @@ UI.registerHelper "verified", -> amIValid()
 
 # Router
 ###
-Important: before rendering and routing, always "dispatch" the user to 'home'
-if he doesn't have the permission to access the current route. 'home' then
-dispatches the user to the correct landing page.
+Important: 'home' dispatches the user to the correct landing page.
 Routes are client side, but even if by hacking the client you can access pages
 without being logged in, it's impossible to inteact with data because
-the server checks all the things before providing the data. It's safe.
+the server doesn't let the user if he doesn't have permission. It's still safe.
 ###
 Router.configure
   layoutTemplate: 'layout'
@@ -41,12 +43,10 @@ Router.map ->
   @route 'register',
     onBeforeAction: -> Router.go 'home' if getUser()
   @route 'account',
-    onBeforeAction: ->
-      if not getUser() then Router.go 'home'
+    onBeforeAction: -> if not getUser() then Router.go 'home'
   @route 'notes',
     waitOn: -> Meteor.subscribe "my-notes"
-    onBeforeAction: ->
-      if not getUser() then Router.go 'home'
+    onBeforeAction: -> if not getUser() then Router.go 'home'
   @route 'note',
     path: '/note/:_id'
     waitOn: -> Meteor.subscribe "my-notes"
@@ -72,7 +72,9 @@ Deps.autorun ->
 # Client Templates
 
 # Some utilities
-logoutCallback = (err) -> if err then errCallback err else Router.go 'home'
+logoutCallback = (err) ->
+  if err then errCallback err
+  else Router.go 'home'; Meteor.unsubscribe "my-notes"
 errCallback = (err) ->
   if err.reason
     showError msg: err.reason
@@ -90,28 +92,43 @@ Template.account.events
   'click #btn-delete-me': -> deleteAccount()
 
 # Notes template
+Template.notelist.active = ->
+  return no unless Router.current() and Router.current().data()
+  return @_id is Router.current().data()._id
 Template.notelist.empty = -> notes.find().count() is 0
+Template.notelist.getDate = ->
+  return unless @date; diff = daysUntil @date
+  if diff <= 0 then return msg:"You missed it!", color: "danger"
+  if diff is 1 then return msg:"Today", color: "warning"
+  if diff is 2 then return msg:"Tomorrow", color: "info"
+  #if new Date(@date).getMonth() > Date.now().getMonth()
+    #return msg:"Next Month", color:"success" unless diff < 7
+  msg: "due in "+diff+" days", color: "primary"
+  #day = new Date(@date).toLocaleString().split(' ')[0]
 Template.notelist.notes = ->
-  d = notes.find().fetch()
+  d = notes.find({},{ sort: date: 1}).fetch()
 Template.notelist.events
   'click .close-note': -> notes.remove @_id
-  'click .edit-note': -> Router.go 'note', {_id: @_id}
   'keypress #newNote': (e,template) ->
     if e.keyCode is 13 and template.find('#newNote').value isnt ""
       notes.insert
         title: template.find('#newNote').value
-        content: ""
-        userId: Meteor.userId()
+        content: "", date: no, archived: no, userId: Meteor.userId()
       template.find('#newNote').value = ""
 
 # Note Editor
-Template.editor.note = -> Router.current.data() # Only when we're in /note/:_id
+Template.editor.note = -> Router.current().data()
+Template.editor.rendered = -> $('.date').datepicker
+  weekStart: 1
+  startDate: "today"
+  todayBtn: "linked"
 saveCurrentNote = (t,e) ->
   if e and e.keyCode isnt 13 then return
   notes.update Router.current().data()._id,
     $set:
       title: t.find('.editor-title').value
       content: t.find('.area').value
+      date: t.find('.date').value
 Template.editor.events
   'click .close-editor': -> Router.go 'notes'
   'click .save-editor': (e,t) -> saveCurrentNote t
