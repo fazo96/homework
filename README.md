@@ -1,6 +1,6 @@
 # Homework
 Schoolwork management application for students. Built using
-[Meteor](http://gihub.com/meteor/meteor), a Web App framework on top of Node.js
+[Meteor](http://github.com/meteor/meteor), a Web App framework on top of Node.js
 and MongoDB.
 
 I built this because I felt like the other apps didn't do it very well.
