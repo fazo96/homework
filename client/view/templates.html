@@ -43,7 +43,7 @@
 
 <template name="notelist">
   <div class="list-group">
-    {{#each notes}}
+    {{#each notelist}}
     <a href="{{pathFor 'note'}}" class="note list-group-item">
       <span class="note-content">
         {{#if active}}<a role="button" href="{{pathFor 'notes'}}" class="edit-note close">
@@ -145,10 +145,14 @@
     {{> error}}
     <input type="text" id="token-field" class="form-control" placeholder="Token">
     <div align="center" class="buttons">
-      <button type="button" class="btn btn-warning btn-ver" id="btn-resend">Resend Email</button>
-      <button type="button" class="btn btn-success btn-ver" id="btn-verify">Verify Token</button>
-      <button type="button" class="btn btn-danger btn-ver" id="btn-delete">Delete Account</button>
-      <br><button type="button" class="btn btn-primary btn-ver" id="btn-logout">Sign Out</button>
+      <button type="button" class="btn btn-warning btn-ver" id="btn-resend">
+        <i class="fa fa-refresh"></i> Resend</button>
+      <button type="button" class="btn btn-success btn-ver" id="btn-verify">
+        <i class="fa fa-check"></i> Verify Token</button>
+      <button type="button" class="btn btn-danger btn-ver" id="btn-delete">
+        <i class="fa fa-trash-o"></i> Delete Account</button>
+      <br><button type="button" class="btn btn-primary btn-ver" id="btn-logout">
+        <i class="fa fa-sign-out"></i> Sign Out</button>
     </div>
   </div>
 </template>

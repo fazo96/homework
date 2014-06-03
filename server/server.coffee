@@ -7,8 +7,8 @@ else
   console.log "Not Sending Emails, please set the MAIL_URL environment variable"
 
 notes = new Meteor.Collection "notes"
-
 getUser = (id) -> Meteor.users.findOne { _id: id }
+isUsers = (u,doc) -> u and doc.userId is u
 
 # Returns true if the user has verified at least one email address
 userValidated = (user) ->
@@ -22,6 +22,10 @@ Meteor.publish "my-notes", ->
 Meteor.publish "archive", ->
   if userValidated getUser(@userId)
     notes.find userId: @userId, archived: yes
+
+# Database Permissions
+# Allow all users to insert, update and remove their notes.
+notes.allow insert: isUsers, update: isUsers, remove: isUsers
 
 # Methods that the clients can invoke
 Meteor.methods

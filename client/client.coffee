@@ -67,8 +67,10 @@ Router.map ->
 # You can't set a callback for when the user logs in using a cookie so...
 # Cheap ass work around for routing the user after he logs in with a token
 Deps.autorun ->
-  t = Router.current(); return unless t and t.lookupTemplate
-  if getUser() and t.lookupTemplate() is 'login' then Router.go 'home'
+  t = Router.current(); return unless getUser() and t and t.lookupTemplate
+  temp = t.lookupTemplate()
+  if temp is 'login' or temp is 'homepage' or temp is 'try'
+    Router.go 'home'
 
 # Client Templates
 
@@ -108,6 +110,8 @@ Template.notelist.getDate = ->
   #day = new Date(@date).toLocaleString().split(' ')[0]
 Template.notelist.notes = ->
   d = notes.find({},{ sort: date: 1}).fetch()
+Template.notelist.notelist = ->
+  
 Template.notelist.events
   'click .close-note': -> notes.remove @_id
   'keypress #newNote': (e,template) ->
