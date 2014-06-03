@@ -20,7 +20,7 @@
 <template name="menu">
   <div align="center" class="menu-container">
   <div class="btn-group">
-    <button type="button" disabled="disabled" class="btn btn-success go-archive">
+    <button type="button" class="btn btn-success go-archive">
       <i class="fa fa-book fa-inverse"></i> Archive
     </button>
     <button type="button" class="btn btn-primary go-home">
@@ -32,8 +32,8 @@
   </div></div>
 </template>
 
-<template name="notes">{{> error }} {{> notelist }} {{> menu}}</template>
-<template name="note">{{> error }} {{> editor }} {{> notelist }} <hr> {{> menu}}</template>
+<template name="notes">{{> error }} {{> editor }} {{> notelist }} {{> menu}}</template>
+<template name="archive">{{> error}} {{> archivedlist }} {{> menu }}</template>
 
 <template name="noteadder">
   <div align="center">
@@ -44,7 +44,7 @@
 <template name="notelist">
   <div class="list-group">
     {{#each notelist}}
-    <a href="{{pathFor 'note'}}" class="note list-group-item">
+    <a href="{{pathFor 'notes'}}" class="note list-group-item">
       <span class="note-content">
         {{#if active}}<a role="button" href="{{pathFor 'notes'}}" class="edit-note close">
           <i class="fa fa-pencil-square-o"></i>
@@ -57,9 +57,35 @@
     {{/each}}
   </div>
   {{#if empty}}
-    <p align="center">You don't have any notes, try adding a new one</p>
+    <p class="lead" align="center">You don't have any notes, try adding a new one!</p>
   {{/if}}
   {{> noteadder }}
+</template>
+
+<template name="archivedlist">
+  {{#unless empty}}
+    <p align="center" class="lead">This is your archive.</p>
+    <p align="center">Click on a note to bring it back to the homepage.</p>
+  {{/unless}}
+  <div class="list-group">
+    {{#each archived}}
+    <a href="{{pathFor 'archive'}}" class="note list-group-item">
+      <span class="note-content">
+        <b>{{title}}</b> <span class="note-desc">{{content}}</span>
+        <!--<span class="note-date label label-{{getDate.color}}">{{getDate.msg}}</span>-->
+      </span>
+      <button type="button" class="close-note close">
+      <i class="fa fa-trash-o"></i></button>
+    </a>
+    {{/each}}
+  </div>
+  {{#if empty}}
+    <p class="lead" align="center">Your archive is empty</p>
+  {{else}}
+    <div align="center" class="in-bt"><button class="btn btn-danger clear">
+      <i class="fa fa-trash-o"></i> Clear</button>
+    </div>
+  {{/if}}
 </template>
 
 <template name="editor">

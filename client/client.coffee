@@ -45,13 +45,22 @@ Router.map ->
   @route 'account',
     onBeforeAction: -> if not getUser() then Router.go 'home'
   @route 'notes',
+    path: '/notes/:_id?'
     waitOn: -> Meteor.subscribe "my-notes"
+    data: -> notes.findOne _id: @params._id
     onBeforeAction: -> if not getUser() then Router.go 'home'
+    onStop: -> console.log "UNLOAD"
+  @route 'archive',
+    path: '/archive/:_id?'
+    waitOn: -> Meteor.subscribe "archive"
+    onBeforeAction: -> if not getUser() then Router.go 'home'
+  ###
   @route 'note',
     path: '/note/:_id'
     waitOn: -> Meteor.subscribe "my-notes"
     data: -> notes.findOne _id: @params._id
     onBeforeAction: -> if not @data()? then Router.go 'home'
+  ###
   @route 'verifyEmail',
     path: '/verify/:token?'
     template: 'verifyEmail'
@@ -98,28 +107,42 @@ Template.account.events
 Template.notelist.active = ->
   return no unless Router.current() and Router.current().data()
   return @_id is Router.current().data()._id
-Template.notelist.empty = -> notes.find().count() is 0
+Template.notelist.empty = -> Template.notelist.notelist().length is 0
 Template.notelist.getDate = ->
   return unless @date; diff = daysUntil @date
   if diff <= 0 then return msg:"You missed it!", color: "danger"
   if diff is 1 then return msg:"Today", color: "warning"
   if diff is 2 then return msg:"Tomorrow", color: "info"
-  #if new Date(@date).getMonth() > Date.now().getMonth()
-    #return msg:"Next Month", color:"success" unless diff < 7
   msg: "due in "+diff+" days", color: "primary"
-  #day = new Date(@date).toLocaleString().split(' ')[0]
-Template.notelist.notes = ->
-  d = notes.find({},{ sort: date: 1}).fetch()
 Template.notelist.notelist = ->
-  
+  notes.find({ archived: no },{ sort: date: 1}).fetch()
+###
+  return [] unless getUser() and Router.current and Router.current().path
+  path = Router.current().path
+  if path.startsWith '/note'
+    return notes.find({ archived: no },{ sort: date: 1}).fetch()
+  else if path.startsWith '/archive'
+    return notes.find({ archived: yes },{ sort: date: 1}).fetch()
+  else return []
+###
 Template.notelist.events
-  'click .close-note': -> notes.remove @_id
+  'click .close-note': -> notes.update @_id, $set: archived: yes
   'keypress #newNote': (e,template) ->
     if e.keyCode is 13 and template.find('#newNote').value isnt ""
       notes.insert
         title: template.find('#newNote').value
         content: "", date: no, archived: no, userId: Meteor.userId()
       template.find('#newNote').value = ""
+
+# Archive
+Template.archivedlist.empty = -> Template.archivedlist.archived().length is 0
+Template.archivedlist.archived = ->
+  notes.find({ archived: yes },{ sort: date: 1}).fetch()
+Template.archivedlist.events =
+  'click .close-note': -> notes.remove @_id
+  'click .note': -> notes.update @_id, $set: archived: no
+  'click .clear': ->
+    notes.remove item._id for item in Template.archivedlist.archived()
 
 # Note Editor
 Template.editor.note = -> Router.current().data()
@@ -135,7 +158,9 @@ saveCurrentNote = (t,e) ->
       content: t.find('.area').value
       date: t.find('.date').value
 Template.editor.events
-  'click .close-editor': -> Router.go 'notes'
+  'click .close-editor': ->
+    Router.go 'notes'
+    #if Router.current().path.startsWith '/note' then Router.go 'notes'
   'click .save-editor': (e,t) -> saveCurrentNote t
   'keypress .title': (e,t) -> saveCurrentNote t, e
 
