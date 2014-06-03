@@ -49,7 +49,6 @@ Router.map ->
     waitOn: -> Meteor.subscribe "my-notes"
     data: -> notes.findOne _id: @params._id
     onBeforeAction: -> if not getUser() then Router.go 'home'
-    onStop: -> console.log "UNLOAD"
   @route 'archive',
     path: '/archive/:_id?'
     waitOn: -> Meteor.subscribe "archive"
