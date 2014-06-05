@@ -1,6 +1,6 @@
 # Homework - Client Side
-
-# Variables and utility stuff
+homework_version = "1.0"
+# Utilities
 notes = new Meteor.Collection "notes"
 getUser = -> Meteor.user()
 deleteAccount = ->
@@ -33,6 +33,7 @@ Router.configure
 Router.map ->
   @route 'home',
     path: '/'
+    template: 'homepage'
     action: -> @render 'homepage', to: 'outside'
     onBeforeAction: ->
       # Dispatch user to the right landing page based on his account status
@@ -53,13 +54,6 @@ Router.map ->
     path: '/archive/:_id?'
     waitOn: -> Meteor.subscribe "archive"
     onBeforeAction: -> if not getUser() then Router.go 'home'
-  ###
-  @route 'note',
-    path: '/note/:_id'
-    waitOn: -> Meteor.subscribe "my-notes"
-    data: -> notes.findOne _id: @params._id
-    onBeforeAction: -> if not @data()? then Router.go 'home'
-  ###
   @route 'verifyEmail',
     path: '/verify/:token?'
     template: 'verifyEmail'
@@ -82,7 +76,7 @@ Deps.autorun ->
 
 # Client Templates
 
-# Some utilities
+# Some utility callbacks
 logoutCallback = (err) ->
   if err then errCallback err
   else Router.go 'home'; Meteor.unsubscribe "my-notes"
@@ -91,18 +85,18 @@ errCallback = (err) ->
     showError msg: err.reason
   else showErrror msg: err
 
-# Menu
+# 3 Buttons navigation Menu
 Template.menu.events
   'click .go-home': -> Router.go 'home'
   'click .go-account': -> Router.go 'account'
   'click .go-archive': -> Router.go 'archive'
 
-# User Interface
+# Account Page
 Template.account.events
   'click #btn-logout': (e,template) -> Meteor.logout logoutCallback
   'click #btn-delete-me': -> deleteAccount()
 
-# Notes template
+# Notes list
 Template.notelist.active = ->
   return no unless Router.current() and Router.current().data()
   return @_id is Router.current().data()._id
@@ -157,13 +151,11 @@ saveCurrentNote = (t,e) ->
       content: t.find('.area').value
       date: t.find('.date').value
 Template.editor.events
-  'click .close-editor': ->
-    Router.go 'notes'
-    #if Router.current().path.startsWith '/note' then Router.go 'notes'
+  'click .close-editor': -> Router.go 'notes'
   'click .save-editor': (e,t) -> saveCurrentNote t
   'keypress .title': (e,t) -> saveCurrentNote t, e
 
-# Notifications
+# Notifications (not used yet)
 alerts = []
 alertDep = new Deps.Dependency
 # Show a notification
@@ -191,7 +183,7 @@ clearError = -> shownError = undefined; errorDep.changed()
 Template.error.error = -> errorDep.depend(); shownError
 Template.error.events 'click .close': -> clearError()
 
-# Verify Email
+# Verify Email page
 Template.verifyEmail.events
   'click #btn-verify': (e,template) ->
     t = template.find('#token-field').value; t = t.split("/")
@@ -218,7 +210,7 @@ Template.login.events
   'keypress .login': (e,template) -> loginRequest e,template
   'click #login-btn': (e,template) -> loginRequest null,template
 
-# Register
+# New Account page
 registerRequest = (e,template) ->
   if e and e.keyCode isnt 13 then return
   mail = template.find('#r-mail').value; pass = template.find('#r-pass').value

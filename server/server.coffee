@@ -29,6 +29,7 @@ notes.allow insert: isUsers, update: isUsers, remove: isUsers
 
 # Methods that the clients can invoke
 Meteor.methods
+  # Request another confirmation email.
   resendConfirmEmail: ->
     u = getUser(@userId)
     if not u
@@ -40,6 +41,7 @@ Meteor.methods
     else
       console.log "User "+u.emails[0].address+" already validated."
       return no
+  # Request user's account to be deleted
   deleteMe: ->
     if @userId
       Meteor.users.remove @userId
@@ -47,4 +49,5 @@ Meteor.methods
       Meteor.users.update {_id: @userId},
       {$set : { "resume.loginTokens" : [] } }, { multi: yes }
       return yes
-    else no
+    no
+  version: -> "1.0" # Request server version number.

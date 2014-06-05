@@ -1,22 +1,6 @@
 <!-- Homework UI Templates -->
 
-<template name="layout">
-  <div class="container">
-    <div class="page-header">
-      <h1 id="title">Homework<br>
-        <small>management for students</small>
-      </h1>
-    </div>
-    {{> yield region='outside'}}
-    <div class="center-block" id="ui-container">
-      {{> yield}}
-    </div>
-    <hr>
-    <div class="center-block" align="center">{{> footer}}</div>
-  </div>
-  {{> ribbon}}
-</template>
-
+<!-- 3 buttons Navigation Menu -->
 <template name="menu">
   <div align="center" class="menu-container">
   <div class="btn-group">
@@ -32,15 +16,18 @@
   </div></div>
 </template>
 
+<!-- /notes and /archive -->
 <template name="notes">{{> error }} {{> editor }} {{> notelist }} {{> menu}}</template>
 <template name="archive">{{> error}} {{> archivedlist }} {{> menu }}</template>
 
+<!-- Note Adder -->
 <template name="noteadder">
   <div align="center">
     <input type="text" id="newNote" class="form-control" placeholder="Add new note">
   </div>
 </template>
 
+<!-- Note List (seen at /notes) -->
 <template name="notelist">
   <div class="list-group">
     {{#each notelist}}
@@ -62,6 +49,7 @@
   {{> noteadder }}
 </template>
 
+<!-- Archive List (seen at /archive) -->
 <template name="archivedlist">
   {{#unless empty}}
     <p align="center" class="lead">This is your archive.</p>
@@ -88,6 +76,7 @@
   {{/if}}
 </template>
 
+<!-- Note Editor (seen at /notes/:_id) -->
 <template name="editor">
   {{#if _id}}
   <div class="panel panel-info">
@@ -108,6 +97,7 @@
   {{/if}}
 </template>
 
+<!-- /login -->
 <template name="login">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-sign-in fa-2x"></i><br>Sign In</h3>
@@ -129,6 +119,7 @@
   </div>
 </template>
 
+<!-- /register -->
 <template name="register">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-user fa-2x"></i><br>New Account</h3>
@@ -148,6 +139,7 @@
   </div>
 </template>
 
+<!-- /account -->
 <template name="account">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-user fa-2x"></i><br>{{email}}</h3>
@@ -163,6 +155,7 @@
   </div>
 </template>
 
+<!-- /verify -->
 <template name="verifyEmail">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-envelope fa-2x"></i><br>
@@ -183,6 +176,7 @@
   </div>
 </template>
 
+<!-- Notification list. It doesn't show anything unless there are notifications -->
 <template name="notifications">
   {{#each notification}}
     <div class="alert alert-{{type}} notification">
@@ -192,6 +186,7 @@
   {{/each}}
 </template>
 
+<!-- Shows an Error if there is one. It's dismissable -->
 <template name="error">
   {{#if error}}
     <div align="center"><div class="alert alert-{{error.type}} error">
@@ -201,6 +196,7 @@
   {{/if}}
 </template>
 
+<!-- Shows the "fork me on github" ribbon -->
 <template name="ribbon">
   <div class="github-fork-ribbon-wrapper right">
     <div class="github-fork-ribbon">
@@ -209,12 +205,14 @@
   </div>
 </template>
 
+<!-- Shows a spinning gear -->
 <template name="loading">
   <div align="center" class="spinning-cog">
     <i class="fa fa-cog fa-spin fa-3x"></i>
   </div>
 </template>
 
+<!-- Footer (used in 'template') -->
 <template name="footer">
   <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
   <p>Built by Enrico Fasoli</p>
@@ -223,6 +221,7 @@
   <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
 </template>
 
+<!-- 404 -->
 <template name="404">
   <div align="center">
     <h1><i class="fa fa-exclamation-triangle fa-2x"></i><br>
@@ -233,6 +232,7 @@
   </div>
 </template>
 
+<!-- Homepage -->
 <template name="homepage">
   <div align="center"><i class="fa fa-book fa-5x"></i></div>
   <p align="center" style="margin-top: 20px" class="lead">A fast, free, organized way to manage your school tasks.</p>
@@ -263,4 +263,22 @@
     </a>
   </div>
   {{/unless}}
+</template>
+
+<!-- Layout for all the pages -->
+<template name="layout">
+  <div class="container">
+    <div class="page-header">
+      <h1 id="title">Homework<br>
+        <small>management for students</small>
+      </h1>
+    </div>
+    {{> yield region='outside'}}
+    <div class="center-block" id="ui-container">
+      {{> yield}}
+    </div>
+    <hr>
+    <div class="center-block" align="center">{{> footer}}</div>
+  </div>
+  {{> ribbon}}
 </template>
