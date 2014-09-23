@@ -33,7 +33,7 @@
     {{#each notelist}}
     <a href="{{pathFor 'notes'}}" class="note list-group-item">
       <span class="note-content">
-        {{#if active}}<a role="button" href="{{pathFor 'notes'}}" class="edit-note close">
+        {{#if active}}<a role="button" class="edit-note close">
           <i class="fa fa-pencil-square-o"></i>
         </a>{{/if}}
         <b>{{title}}</b> <span class="note-desc">{{content}}</span>

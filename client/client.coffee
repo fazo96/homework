@@ -120,6 +120,7 @@ Template.notelist.notelist = ->
 ###
 Template.notelist.events
   'click .close-note': -> notes.update @_id, $set: archived: yes
+  'click .edit-note': -> Router.go 'notes'
   'keypress #newNote': (e,template) ->
     if e.keyCode is 13 and template.find('#newNote').value isnt ""
       notes.insert
