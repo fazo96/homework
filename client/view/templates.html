@@ -62,7 +62,7 @@
         <b>{{title}}</b> <span class="note-desc">{{content}}</span>
         <!--<span class="note-date label label-{{getDate.color}}">{{getDate.msg}}</span>-->
       </span>
-      <button type="button" class="close-note close">
+      <button type="button" class="close-note close archive-close-note">
       <i class="fa fa-trash-o"></i></button>
     </a>
     {{/each}}
@@ -90,7 +90,7 @@
     </div>
     <div align="center" class="panel-body">
       <textarea id="area" class="area form-control in-bt" rows="3" placeholder="...">{{content}}</textarea>
-      <input class="form-control date" value="{{date}}" placeholder="Due Date">
+      <!--<input class="form-control date" value="{{date}}" placeholder="Due Date">-->
       <button type="button" class="btn btn-info save-editor">Save</button>
     </div>
   </div>
@@ -162,7 +162,7 @@
       Please verify your Email Address<br><small>{{email}}</small></h3>
     <p>Click the link inside the email we sent you or paste it here:</p>
     {{> error}}
-    <input type="text" id="token-field" class="form-control" placeholder="Token">
+    <input type="text" id="token-field" class="form-control" placeholder="Token" value="{{token}}">
     <div align="center" class="buttons">
       <button type="button" class="btn btn-warning btn-ver" id="btn-resend">
         <i class="fa fa-refresh"></i> Resend</button>

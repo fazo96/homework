@@ -30,6 +30,17 @@ Router.configure
   layoutTemplate: 'layout'
   loadingTemplate: 'loading'
   notFoundTemplate: '404'
+
+loggedInController = RouteController.extend
+  action: -> if @ready then @render() else @render 'loading'
+  onBeforeAction: ->
+    if not getUser() then Router.go 'home'
+    if not amIValid() then Router.go 'verifyEmail'
+guestController = RouteController.extend
+  onBeforeAction: ->
+    if getUser()
+      if not amIValid() then Router.go 'verifyEmail' else Router.go 'home'
+
 Router.map ->
   @route 'home',
     path: '/'
@@ -39,29 +50,29 @@ Router.map ->
       # Dispatch user to the right landing page based on his account status
       if getUser()
         if amIValid() is yes then Router.go 'notes' else Router.go 'verifyEmail'
-  @route 'login',
-    onBeforeAction: -> Router.go 'home' if getUser()
-  @route 'register',
-    onBeforeAction: -> Router.go 'home' if getUser()
-  @route 'account',
-    onBeforeAction: -> if not getUser() then Router.go 'home'
+  @route 'login', controller: guestController
+  @route 'register', controller: guestController
+  @route 'account', controller: loggedInController
   @route 'notes',
     path: '/notes/:_id?'
-    waitOn: -> Meteor.subscribe "my-notes"
+    waitOn: -> Meteor.subscribe 'my-notes'
     data: -> notes.findOne _id: @params._id
-    onBeforeAction: -> if not getUser() then Router.go 'home'
+    controller: loggedInController
   @route 'archive',
     path: '/archive/:_id?'
-    waitOn: -> Meteor.subscribe "archive"
-    onBeforeAction: -> if not getUser() then Router.go 'home'
+    waitOn: -> @notes = Meteor.subscribe 'archive'
+    onStop: -> @notes.stop()
+    controller: loggedInController
   @route 'verifyEmail',
     path: '/verify/:token?'
     template: 'verifyEmail'
     onBeforeAction: ->
+      # Automatic verification
       if @params.token? and @params.token isnt ""
+        @render 'loading'
         Accounts.verifyEmail @params.token, (err) ->
           if err
-            errCallback err; Router.go 'verifyEmail'
+            errCallback err; Router.go 'verifyEmail', token: @params.token
           else Router.go 'home'
   @route 'homepage', action: -> @render '404'
   @route '404', path: '*'
@@ -185,6 +196,7 @@ Template.error.error = -> errorDep.depend(); shownError
 Template.error.events 'click .close': -> clearError()
 
 # Verify Email page
+Template.verifyEmail.token = -> Router.current().params.token
 Template.verifyEmail.events
   'click #btn-verify': (e,template) ->
     t = template.find('#token-field').value; t = t.split("/")

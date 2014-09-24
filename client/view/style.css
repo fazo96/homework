@@ -54,6 +54,13 @@ input {
   margin-top: -2px;
   clear:both;
 }
+
+@media (max-width: 442px) {
+  .archive-close-note {
+    margin-top: -25px;
+  }
+}
+
 .note-date{
   float:right;
   margin-top: -17px;
@@ -73,7 +80,6 @@ input {
 
 .edit-note {
   display: inline-block;
-  float: left;
   margin-right: 10px;
 }
 
