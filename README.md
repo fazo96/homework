@@ -10,10 +10,15 @@ Also, I learnt a lot and had fun!
 [the app is hosted online!](http://homework.meteor.com)
 
 ### Development
-Clone the repo, [install meteor](http://meteor.com) and **meteorite**.
-Install dependent packages with `mrt install` and then run `meteor`. That's it.
+Clone the repo, [install meteor](http://meteor.com), `cd` to the directory
+then run `meteor`.
+
+That's it.
+
 If you want to send emails (necessary to confirm users) you need to set the
-`MAIL_URL` environment variable, or else the emails will be printed on stdout.
+`MAIL_URL` environment variable, or else the emails will just be printed on
+stdout. The process is
+[explained on the Meteor docs](http://docs.meteor.com/#email)
 
 
 ### License
