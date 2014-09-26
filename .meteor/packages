@@ -5,9 +5,10 @@
 
 standard-app-packages
 coffeescript
-mrt:bootstrap-3@3.1.1-1
 natestrauser:font-awesome@4.1.0
 accounts-base
 accounts-password
 iron:router
 mrt:moment
+mizzao:bootstrap-3
+
