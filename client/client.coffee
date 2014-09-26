@@ -2,16 +2,13 @@
 homework_version = "1.0"
 # Utilities
 notes = new Meteor.Collection "notes"
+Meteor.subscribe 'user'
 getUser = -> Meteor.user()
 deleteAccount = ->
   Meteor.call 'deleteMe', (r) -> if r is yes then Router.go 'home'
 amIValid = ->
   return no unless getUser()
   return yes for mail in getUser().emails when mail.verified is yes; no
-daysUntil = (time) ->
-  date = new Date time; now = new Date() #console.log date+" "+now
-  now.setHours(0); now.setMinutes(0); now.setSeconds(0)
-  (Math.floor ((date.getTime() - now.getTime()) / 1000 / 60 / 60) + 1) / 24
 
 # Common Helpers for the Templates
 UI.registerHelper "loggingIn", -> Meteor.loggingIn()
@@ -103,8 +100,15 @@ Template.menu.events
   'click .go-archive': -> Router.go 'archive'
 
 # Account Page
+Template.account.dateformat = -> getUser().dateformat
 Template.account.events
-  'click #btn-logout': (e,template) -> Meteor.logout logoutCallback
+  'click #reset-settings': (e,t) ->
+    t.find('#set-date-format').value = "MM/DD/YYYY"
+  'click #save-settings': (e,t) ->
+    Meteor.users.update getUser()._id,
+      $set: dateformat: t.find('#set-date-format').value
+    showError msg: 'Settings saved', type: 'success'
+  'click #btn-logout': -> Meteor.logout logoutCallback
   'click #btn-delete-me': -> deleteAccount()
 
 # Notes list
@@ -113,22 +117,16 @@ Template.notelist.active = ->
   return @_id is Router.current().data()._id
 Template.notelist.empty = -> Template.notelist.notelist().length is 0
 Template.notelist.getDate = ->
-  return unless @date; diff = daysUntil @date
-  if diff <= 0 then return msg:"You missed it!", color: "danger"
-  if diff is 1 then return msg:"Today", color: "warning"
-  if diff is 2 then return msg:"Tomorrow", color: "info"
-  msg: "due in "+diff+" days", color: "primary"
+  return unless @date
+  #dif = moment(@date, getUser().dateformat).diff(moment(), 'days')
+  dif = moment.unix(@date).diff(moment(), 'days')
+  color = "primary"
+  color = "info" if dif < 7
+  color = "warning" if dif is 1
+  color = "danger" if dif < 1
+  msg: moment.unix(@date).fromNow(), color: color
 Template.notelist.notelist = ->
   notes.find({ archived: no },{ sort: date: 1}).fetch()
-###
-  return [] unless getUser() and Router.current and Router.current().path
-  path = Router.current().path
-  if path.startsWith '/note'
-    return notes.find({ archived: no },{ sort: date: 1}).fetch()
-  else if path.startsWith '/archive'
-    return notes.find({ archived: yes },{ sort: date: 1}).fetch()
-  else return []
-###
 Template.notelist.events
   'click .close-note': -> notes.update @_id, $set: archived: yes
   'click .edit-note': -> Router.go 'notes'
@@ -141,6 +139,7 @@ Template.notelist.events
 
 # Archive
 Template.archivedlist.empty = -> Template.archivedlist.archived().length is 0
+Template.archivedlist.getDate = Template.notelist.getDate
 Template.archivedlist.archived = ->
   notes.find({ archived: yes },{ sort: date: 1}).fetch()
 Template.archivedlist.events =
@@ -151,20 +150,29 @@ Template.archivedlist.events =
 
 # Note Editor
 Template.editor.note = -> Router.current().data()
-Template.editor.rendered = -> $('.date').datepicker
-  weekStart: 1
-  startDate: "today"
-  todayBtn: "linked"
+Template.editor.formattedDate = ->
+  return unless @date
+  moment.unix(@date).format(getUser().dateformat)
 saveCurrentNote = (t,e) ->
   if e and e.keyCode isnt 13 then return
+  dat = no
+  if t.find('.date').value isnt ""
+    dat = moment(t.find('.date').value,getUser().dateformat)
+    if dat.isValid()
+      dat = dat.unix()
+    else
+      dat = no; showError msg: 'Invalid date'
+      t.find('.date').value = ""
   notes.update Router.current().data()._id,
     $set:
       title: t.find('.editor-title').value
       content: t.find('.area').value
-      date: t.find('.date').value
+      date: dat
 Template.editor.events
   'click .close-editor': -> Router.go 'notes'
   'click .save-editor': (e,t) -> saveCurrentNote t
+  'click .set-date': (e,t) ->
+    t.find('.date').value = moment().add(1,'days').format(getUser().dateformat)
   'keypress .title': (e,t) -> saveCurrentNote t, e
 
 # Notifications (not used yet)
@@ -241,6 +249,7 @@ registerRequest = (e,template) ->
       Accounts.createUser {
         email: mail,
         password: pass
+        dateformat: "MM/DD/YYYY"
       }, (err) -> if err then errCallback err else Router.go 'confirmEmail'
     catch err
       showError msg: err

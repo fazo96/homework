@@ -15,6 +15,7 @@ userValidated = (user) ->
   return no unless user?
   return yes for mail in user.emails when mail.verified is yes; no
 
+Meteor.publish 'user', -> Meteor.users.find @userId, fields: dateformat: 1
 # Publish user's notes to each user.
 Meteor.publish "my-notes", ->
   if userValidated getUser(@userId)
@@ -50,4 +51,9 @@ Meteor.methods
       {$set : { "resume.loginTokens" : [] } }, { multi: yes }
       return yes
     no
-  version: -> "1.0" # Request server version number.
+Meteor.users.allow
+  update: (id,doc,fields,mod) ->
+    if fields[0] == 'dateformat' and fields.length == 1
+      console.log mod
+      return yes
+    return no

@@ -33,7 +33,7 @@
     {{#each notelist}}
     <a href="{{pathFor 'notes'}}" class="note list-group-item">
       <span class="note-content">
-        {{#if active}}<a role="button" class="edit-note close">
+        {{#if active}}<a role="button" class="edit-note">
           <i class="fa fa-pencil-square-o"></i>
         </a>{{/if}}
         <b>{{title}}</b> <span class="note-desc">{{content}}</span>
@@ -60,7 +60,7 @@
     <a href="{{pathFor 'archive'}}" class="note list-group-item">
       <span class="note-content">
         <b>{{title}}</b> <span class="note-desc">{{content}}</span>
-        <!--<span class="note-date label label-{{getDate.color}}">{{getDate.msg}}</span>-->
+        <span class="note-date label label-{{getDate.color}}">{{getDate.msg}}</span>
       </span>
       <button type="button" class="close-note close archive-close-note">
       <i class="fa fa-trash-o"></i></button>
@@ -90,8 +90,11 @@
     </div>
     <div align="center" class="panel-body">
       <textarea id="area" class="area form-control in-bt" rows="3" placeholder="...">{{content}}</textarea>
-      <!--<input class="form-control date" value="{{date}}" placeholder="Due Date">-->
-      <button type="button" class="btn btn-info save-editor">Save</button>
+      <input class="form-control date" value="{{formattedDate}}" placeholder="Due Date">
+      <button type="button" class="btn btn-warning set-date">
+        <i class="fa fa-clock-o"></i> Do Today</button>
+      <button type="button" class="btn btn-info save-editor">
+        <i class="fa fa-upload"></i> Save</button>
     </div>
   </div>
   {{/if}}
@@ -143,6 +146,16 @@
 <template name="account">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-user fa-2x"></i><br>{{email}}</h3>
+    {{> error}}
+    <p class="lead">Settings</p>
+    <p>You can choose the format used to write and read dates in the note list</p>
+    <input type="text" class="form-control" id="set-date-format" placeholder="Date Format" value="{{dateformat}}">
+    <div class="btn-group">
+      <button type="button" id="save-settings" class="btn btn-primary">
+        <i class="fa fa-upload"></i> Save</button>
+      <button type="button" id="reset-settings" class="btn btn-warning">
+        <i class="fa fa-cog"></i> Reset</button>
+    </div>
     {{> menu}}
     <div class="btn-group btns-account">
       <button type="button" id="btn-logout" class="btn btn-warning">
@@ -163,16 +176,16 @@
     <p>Click the link inside the email we sent you or paste it here:</p>
     {{> error}}
     <input type="text" id="token-field" class="form-control" placeholder="Token" value="{{token}}">
-    <div align="center" class="buttons">
+    <div align="center" class="btn-group">
       <button type="button" class="btn btn-warning btn-ver" id="btn-resend">
         <i class="fa fa-refresh"></i> Resend</button>
       <button type="button" class="btn btn-success btn-ver" id="btn-verify">
-        <i class="fa fa-check"></i> Verify Token</button>
+        <i class="fa fa-check"></i> Verify</button>
       <button type="button" class="btn btn-danger btn-ver" id="btn-delete">
-        <i class="fa fa-trash-o"></i> Delete Account</button>
-      <br><button type="button" class="btn btn-primary btn-ver" id="btn-logout">
-        <i class="fa fa-sign-out"></i> Sign Out</button>
-    </div>
+        <i class="fa fa-trash-o"></i> Delete</button>
+    </div><br>
+    <button type="button" class="btn btn-primary btn-ver" id="btn-logout">
+      <i class="fa fa-sign-out"></i> Sign Out</button>
   </div>
 </template>
 

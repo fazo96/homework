@@ -10,5 +10,4 @@ natestrauser:font-awesome@4.1.0
 accounts-base
 accounts-password
 iron:router
-rajit:bootstrap3-datepicker
-
+mrt:moment
