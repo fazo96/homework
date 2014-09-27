@@ -24,6 +24,11 @@ Meteor.publish "archive", ->
   if userValidated getUser(@userId)
     notes.find userId: @userId, archived: yes
 
+# Custom new account default settings
+Accounts.onCreateUser (options, user) ->
+  user.dateformat = options.dateformat or "MM/DD/YYYY"
+  return user
+
 # Database Permissions
 # Allow all users to insert, update and remove their notes.
 notes.allow insert: isUsers, update: isUsers, remove: isUsers

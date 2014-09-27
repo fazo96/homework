@@ -249,7 +249,6 @@ registerRequest = (e,template) ->
       Accounts.createUser {
         email: mail,
         password: pass
-        dateformat: "MM/DD/YYYY"
       }, (err) -> if err then errCallback err else Router.go 'confirmEmail'
     catch err
       showError msg: err
