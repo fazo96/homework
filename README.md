@@ -18,8 +18,9 @@ That's it.
 If you want to send emails (necessary to confirm users) you need to set the
 `MAIL_URL` environment variable, or else the emails will just be printed on
 stdout. The process is
-[explained on the Meteor docs](http://docs.meteor.com/#email)
+[explained on the Meteor docs](http://docs.meteor.com/#email).
 
+You can also change mail settings in `server/accounts.coffee`.
 
 ### License
 The MIT License (MIT)
