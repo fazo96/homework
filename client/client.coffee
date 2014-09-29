@@ -13,7 +13,7 @@ amIValid = ->
   return yes for mail in getUser().emails when mail.verified is yes; no
 
 # Common Helpers for the Templates
-UI.registerHelper "version", -> "1.1.1"
+UI.registerHelper "version", -> "1.1.2"
 UI.registerHelper "status", -> Meteor.status()
 UI.registerHelper "loading", -> Meteor.loggingIn() or !Meteor.status().connected
 UI.registerHelper "email", ->
@@ -47,7 +47,8 @@ loggedInController = RouteController.extend
     else @render()
   onBeforeAction: ->
     if not getUser() then Router.go 'home'
-    if not amIValid() then Router.go 'verifyEmail'
+    else if not amIValid() then Router.go 'verifyEmail'
+
 guestController = RouteController.extend
   action: ->
     if Meteor.status().connected is no
@@ -55,13 +56,17 @@ guestController = RouteController.extend
     else @render()
   onBeforeAction: ->
     if getUser()
-      if not amIValid() then Router.go 'verifyEmail' else Router.go 'home'
+      if amIValid() is no then Router.go 'verifyEmail' else Router.go 'notes'
+
 
 Router.map ->
   @route 'home',
     path: '/'
     template: 'homepage'
-    action: -> @render 'homepage', to: 'outside'
+    action: ->
+      if Meteor.status().connected is no
+        @render 'reconnect'
+      else @render 'homepage', to: 'outside'
     onBeforeAction: ->
       # Dispatch user to the right landing page based on his account status
       if getUser()
@@ -82,25 +87,25 @@ Router.map ->
   @route 'verifyEmail',
     path: '/verify/:token?'
     template: 'verifyEmail'
-    controller: guestController
+    action: ->
+      if Meteor.status().connected is no
+        @render 'reconnect'
+      else @render()
     onBeforeAction: ->
+      if getUser()
+        if amIValid() then Router.go 'home'
+      else Router.go 'home'
       # Automatic verification
       if @params.token? and @params.token isnt ""
         @render 'loading'
         Accounts.verifyEmail @params.token, (err) ->
           if err
             errCallback err; Router.go 'verifyEmail', token: @params.token
-          else Router.go 'home'
+          else
+            showErr type:'success', msg:'Verification complete'
+            Router.go 'home'
   @route 'homepage', action: -> @render '404'
   @route '404', path: '*'
-
-# You can't set a callback for when the user logs in using a cookie so...
-# Cheap ass work around for routing the user after he logs in with a token
-Deps.autorun ->
-  t = Router.current(); return unless getUser() and t and t.lookupTemplate
-  temp = t.lookupTemplate()
-  if temp is 'login' or temp is 'homepage' or temp is 'try'
-    Router.go 'home'
 
 # Client Templates
 
