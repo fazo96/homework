@@ -73,6 +73,14 @@ input {
 .note-date{
   float:right;
 }
+
+/* firefox specific fix */
+@-moz-document url-prefix() {
+  .note-date{
+    margin-top: -17px;
+  }
+}
+
 .note-desc {
   color: #999;
 }

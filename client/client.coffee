@@ -150,6 +150,7 @@ Template.archivedlist.events =
 
 # Note Editor
 Template.editor.note = -> Router.current().data()
+Template.editor.dateformat = -> getUser().dateformat
 Template.editor.formattedDate = ->
   return unless @date
   moment.unix(@date).format(getUser().dateformat)
