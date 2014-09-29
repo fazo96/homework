@@ -105,13 +105,13 @@
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-sign-in fa-2x"></i><br>Sign In</h3>
     {{> error}}
-    {{#if loggingIn}}
+    {{#if loading}}
       {{> loading}}
     {{else}}
       <input type="text" id="l-mail" class="form-control login in-bt" placeholder="Email">
       <input type="password" id="l-pass" class="form-control login in-bt" placeholder="Password">
     {{/if}}
-    {{#unless loggingIn}}
+    {{#unless loading}}
       <a role="button" href="{{pathFor 'register'}}" class="btn-fix btn btn-success">
         <i class="fa fa-user"></i> Sign Up</a>
       <a role="button" id="login-btn" class="btn-fix btn btn-primary">
@@ -126,7 +126,7 @@
 <template name="register">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-user fa-2x"></i><br>New Account</h3>
-    {{#if loggingIn}}
+    {{#if loading}}
       {{> loading}}
     {{else}}
       <p>Password must be at least 8 characters. You will need to confirm your email.</p>
@@ -225,13 +225,27 @@
   </div>
 </template>
 
+<template name="reconnect">
+  <div align="center" class="spinning-cog">
+    <i class="fa fa-cog fa-spin fa-4x"></i>
+    <h3>Connecting to Server
+      <br><small><b>Status:</b> {{status.status}}
+      {{#if status.reason}}<b>Reason:</b> {{status.reason}}{{/if}}
+      {{time}}
+    </small></h3>
+    <!--<p>If the problem persists, try reloading the page or contact the website administrator.</p>-->
+  </div>
+</template>
+
 <!-- Footer (used in 'template') -->
 <template name="footer">
   <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
   <p>Built by Enrico Fasoli</p>
-  <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
-  <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
-  <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
+  <div class="links">
+    <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
+    <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
+    <a class="custom-link" href="http://github.com/fazo96"><i class="fa fa-github fa-2x"></i></a>
+  </div>
 </template>
 
 <!-- 404 -->
@@ -249,7 +263,7 @@
 <template name="homepage">
   <div align="center"><i class="fa fa-book fa-5x"></i></div>
   <p align="center" style="margin-top: 20px" class="lead">A fast, free, organized way to manage your school tasks.</p>
-  {{#if loggingIn}}{{> loading}} {{/if}}
+  {{#if loading}}{{> loading}} {{/if}}
   <div class="row" align="center">
     <div class="col-sm-4">
       <h2><i class="fa fa-code-fork"></i> Free.
@@ -266,7 +280,7 @@
       <small>Works on all modern <u>Mobile</u> and <u>Desktop</u> browsers.
       Your password is safe and <u>not</u> stored online.</small></h2></div>
   </div>
-  {{#unless loggingIn}}
+  {{#unless loading}}
   <div align="center" style="margin-top:20px;">
     <a href="{{pathFor 'login'}}" role="button" class="btn btn-primary">
       <i class="fa fa-sign-in"></i> Sign In

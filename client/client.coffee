@@ -1,8 +1,10 @@
 # Homework - Client Side
-homework_version = "1.0"
 # Utilities
+tick = new Deps.Dependency()
+Meteor.setInterval (-> tick.changed();), 15000
+
 notes = new Meteor.Collection "notes"
-Meteor.subscribe 'user'
+userSub = Meteor.subscribe 'user'
 getUser = -> Meteor.user()
 deleteAccount = ->
   Meteor.call 'deleteMe', (r) -> if r is yes then Router.go 'home'
@@ -11,7 +13,9 @@ amIValid = ->
   return yes for mail in getUser().emails when mail.verified is yes; no
 
 # Common Helpers for the Templates
-UI.registerHelper "loggingIn", -> Meteor.loggingIn()
+UI.registerHelper "version", -> "1.1.1"
+UI.registerHelper "status", -> Meteor.status()
+UI.registerHelper "loading", -> Meteor.loggingIn() or !Meteor.status().connected
 UI.registerHelper "email", ->
   if getUser() then return getUser().emails[0].address
 UI.registerHelper "verified", -> amIValid()
@@ -27,13 +31,28 @@ Router.configure
   layoutTemplate: 'layout'
   loadingTemplate: 'loading'
   notFoundTemplate: '404'
+  action: ->
+    if Meteor.status().connected is no
+      @render 'reconnect'
+    else if Meteor.loggingIn()
+      @render 'loading'
+    else @render()
 
 loggedInController = RouteController.extend
-  action: -> if @ready then @render() else @render 'loading'
+  action: ->
+    if Meteor.status().connected is no
+      @render 'reconnect'
+    else if !@ready() or Meteor.loggingIn()
+      @render 'loading'
+    else @render()
   onBeforeAction: ->
     if not getUser() then Router.go 'home'
     if not amIValid() then Router.go 'verifyEmail'
 guestController = RouteController.extend
+  action: ->
+    if Meteor.status().connected is no
+      @render 'reconnect'
+    else @render()
   onBeforeAction: ->
     if getUser()
       if not amIValid() then Router.go 'verifyEmail' else Router.go 'home'
@@ -63,6 +82,7 @@ Router.map ->
   @route 'verifyEmail',
     path: '/verify/:token?'
     template: 'verifyEmail'
+    controller: guestController
     onBeforeAction: ->
       # Automatic verification
       if @params.token? and @params.token isnt ""
@@ -93,6 +113,11 @@ errCallback = (err) ->
     showError msg: err.reason
   else showErrror msg: err
 
+Template.reconnect.time = ->
+  tick.depend()
+  if Meteor.status().retryTime
+    '(retrying '+moment(Meteor.status().retryTime).fromNow()+')'
+
 # 3 Buttons navigation Menu
 Template.menu.events
   'click .go-home': -> Router.go 'home'
@@ -118,6 +143,7 @@ Template.notelist.active = ->
 Template.notelist.empty = -> Template.notelist.notelist().length is 0
 Template.notelist.getDate = ->
   return unless @date
+  tick.depend()
   #dif = moment(@date, getUser().dateformat).diff(moment(), 'days')
   dif = moment.unix(@date).diff(moment(), 'days')
   color = "primary"

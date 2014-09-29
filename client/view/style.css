@@ -9,6 +9,10 @@ input {
   text-align: center;
 }
 
+.links {
+  margin-bottom: 10px;
+}
+
 .close {
   clear:both;
 }
