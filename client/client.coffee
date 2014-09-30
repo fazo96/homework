@@ -1,4 +1,5 @@
 # Homework - Client Side
+version = "1.1.3"
 # Utilities
 tick = new Deps.Dependency()
 Meteor.setInterval (-> tick.changed();), 15000
@@ -13,12 +14,17 @@ amIValid = ->
   return yes for mail in getUser().emails when mail.verified is yes; no
 
 # Common Helpers for the Templates
-UI.registerHelper "version", -> "1.1.2"
+UI.registerHelper "version", -> version
 UI.registerHelper "status", -> Meteor.status()
 UI.registerHelper "loading", -> Meteor.loggingIn() or !Meteor.status().connected
 UI.registerHelper "email", ->
   if getUser() then return getUser().emails[0].address
 UI.registerHelper "verified", -> amIValid()
+
+Meteor.startup ->
+  console.log "Homework version "+version
+  console.log "This software is Free Software (MIT License)"
+  console.log "More information at http://github.com/fazo96/homework"
 
 # Router
 ###
@@ -63,10 +69,7 @@ Router.map ->
   @route 'home',
     path: '/'
     template: 'homepage'
-    action: ->
-      if Meteor.status().connected is no
-        @render 'reconnect'
-      else @render 'homepage', to: 'outside'
+    action: -> @render 'homepage', to: 'outside'
     onBeforeAction: ->
       # Dispatch user to the right landing page based on his account status
       if getUser()
@@ -104,7 +107,6 @@ Router.map ->
           else
             showErr type:'success', msg:'Verification complete'
             Router.go 'home'
-  @route 'homepage', action: -> @render '404'
   @route '404', path: '*'
 
 # Client Templates

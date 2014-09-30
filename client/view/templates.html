@@ -240,7 +240,7 @@
 <!-- Footer (used in 'template') -->
 <template name="footer">
   <p>This app is <a href="https://en.wikipedia.org/wiki/Free_software">Free Software</a>, under the <a href="http://opensource.org/licenses/MIT">MIT License</a></p>
-  <p>Built by Enrico Fasoli</p>
+  <p>Built by Enrico Fasoli (v{{version}})</p>
   <div class="links">
     <a class="custom-link" href="http://www.linkedin.com/profile/view?id=292450419"><i class="fa fa-linkedin fa-2x"></i></a>
     <a href="http://twitter.com/fazo96"><i class="fa fa-twitter fa-2x footer-center-icon"></i></a>
@@ -263,7 +263,7 @@
 <template name="homepage">
   <div align="center"><i class="fa fa-book fa-5x"></i></div>
   <p align="center" style="margin-top: 20px" class="lead">A fast, free, organized way to manage your school tasks.</p>
-  {{#if loading}}{{> loading}} {{/if}}
+  {{#if loading}}{{> loading}}{{/if}}
   <div class="row" align="center">
     <div class="col-sm-4">
       <h2><i class="fa fa-code-fork"></i> Free.
