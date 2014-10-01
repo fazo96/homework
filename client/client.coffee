@@ -52,6 +52,7 @@ loggedInController = RouteController.extend
       @render 'loading'
     else @render()
   onBeforeAction: ->
+    showError()
     if not getUser() then Router.go 'home'
     else if not amIValid() then Router.go 'verifyEmail'
 
@@ -61,6 +62,7 @@ guestController = RouteController.extend
       @render 'reconnect'
     else @render()
   onBeforeAction: ->
+    showError()
     if getUser()
       if amIValid() is no then Router.go 'verifyEmail' else Router.go 'notes'
 
@@ -231,11 +233,12 @@ Template.notifications.events
 # "Error" visualization template
 errorDep = new Deps.Dependency; shownError = undefined
 showError = (err) ->
-  shownError = err; shownError.type = err.type or "danger"
+  if err?
+    shownError = err; shownError.type = err.type or "danger"
+  else shownError = undefined
   errorDep.changed()
-clearError = -> shownError = undefined; errorDep.changed()
 Template.error.error = -> errorDep.depend(); shownError
-Template.error.events 'click .close': -> clearError()
+Template.error.events 'click .close': -> showError()
 
 # Verify Email page
 Template.verifyEmail.token = -> Router.current().params.token
@@ -243,7 +246,6 @@ Template.verifyEmail.events
   'click #btn-verify': (e,template) ->
     t = template.find('#token-field').value; t = t.split("/")
     t = t[t.length-1] # Remove all the part before the last "/"
-    console.log "Email ver. using token: "+template.find('#token-field').value
     Accounts.verifyEmail t, (err) ->
       if err then errCallback err else Router.go 'notes'
   'click #btn-resend': ->

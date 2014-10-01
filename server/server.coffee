@@ -56,9 +56,10 @@ Meteor.methods
       {$set : { "resume.loginTokens" : [] } }, { multi: yes }
       return yes
     no
+
+# Allow users to change their date format
 Meteor.users.allow
   update: (id,doc,fields,mod) ->
     if fields[0] == 'dateformat' and fields.length == 1
-      console.log mod
       return yes
     return no
