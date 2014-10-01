@@ -144,12 +144,12 @@ input {
   resize: none;
 }
 
-/* IDs */
-
 .footer-center-icon {
   margin-left: 10px;
   margin-right: 10px
 }
+
+/* IDs */
 
 #ui-container {
   width: 90%;
