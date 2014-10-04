@@ -20,7 +20,9 @@ If you want to send emails (necessary to confirm users) you need to set the
 stdout. The process is
 [explained on the Meteor docs](http://docs.meteor.com/#email).
 
-You can also change mail settings in `server/accounts.coffee`.
+In the mails sent by Homework, the website links point to the `ROOT_URL`
+environment variable as
+[explained on the Meteor docs](http://docs.meteor.com/#meteor_absoluteurl).
 
 ### License
 The MIT License (MIT)

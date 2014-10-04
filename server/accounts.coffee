@@ -21,5 +21,6 @@ Accounts.validateNewUser (user) ->
 Accounts.emailTemplates.siteName = "Homework App"
 Accounts.emailTemplates.verifyEmail.text = (user,url) ->
   urlist = url.split('/'); token = urlist[urlist.length-1]
+  url = Meteor.absoluteUrl 'verify/'+token
   '''Welcome to Homework! To activate your account, click on the \
-  following link: http://homework.meteor.com/verify/'''+token
+  following link: '''+url
