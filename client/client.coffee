@@ -1,5 +1,5 @@
 # Homework - Client Side
-version = "1.1.3"
+version = "1.1.4"
 # Utilities
 tick = new Deps.Dependency()
 Meteor.setInterval (-> tick.changed();), 15000
