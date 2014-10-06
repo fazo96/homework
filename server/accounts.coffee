@@ -7,7 +7,7 @@ validateEmail = (email) ->
 
 Accounts.config {
   sendVerificationEmail: true
-  loginExpirationInDays: 1
+  loginExpirationInDays: 30
 }
 
 # Code that checks if a new user request is valid
