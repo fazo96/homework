@@ -24,6 +24,10 @@ In the mails sent by Homework, the website links point to the `ROOT_URL`
 environment variable as
 [explained on the Meteor docs](http://docs.meteor.com/#meteor_absoluteurl).
 
+You'll probably also need [phantomjs](http://phantomjs.org/) installed
+since the apps now depends on Meteor's
+[spiderable](http://docs.meteor.com/#spiderable) package.
+
 #### Twitter Authentication
 
 Create this file: `server/settings.coffee` with this content:
