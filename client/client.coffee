@@ -1,5 +1,5 @@
 # Homework - Client Side
-version = "1.1.4"
+version = "1.1.5"
 # Utilities
 tick = new Deps.Dependency()
 Meteor.setInterval (-> tick.changed();), 15000
@@ -8,9 +8,17 @@ notes = new Meteor.Collection "notes"
 userSub = Meteor.subscribe 'user'
 getUser = -> Meteor.user()
 deleteAccount = ->
-  Meteor.call 'deleteMe', (r) -> if r is yes then Router.go 'home'
+  swal {
+    title: 'Are you sure?'
+    text: 'Do you want to permanently delete all your data?'
+    type: 'warning'
+    showCancelButton: yes
+    confirmButtonColor: "#DD6B55"
+    confirmButtonText: "Yes!"
+    }, -> Meteor.call 'deleteMe', (r) -> if r is yes then Router.go 'home'
 amIValid = ->
   return no unless getUser()
+  return yes if getUser().username
   return yes for mail in getUser().emails when mail.verified is yes; no
 
 # Common Helpers for the Templates
@@ -18,7 +26,9 @@ UI.registerHelper "version", -> version
 UI.registerHelper "status", -> Meteor.status()
 UI.registerHelper "loading", -> Meteor.loggingIn() or !Meteor.status().connected
 UI.registerHelper "email", ->
-  if getUser() then return getUser().emails[0].address
+  if getUser()
+    if getUser().username then return getUser().username
+    else return getUser().emails[0].address
 UI.registerHelper "verified", -> amIValid()
 
 Meteor.startup ->
@@ -115,13 +125,18 @@ Router.map ->
 
 # Some utility callbacks
 logoutCallback = (err) ->
-  if err then errCallback err
-  else Router.go 'home'; Meteor.unsubscribe "my-notes"
+  if err then errCallback err else Router.go 'home'
 errCallback = (err) ->
   if err.reason
     showError msg: err.reason
   else showErrror msg: err
 
+Template.homepage.events
+  'click #twitter': -> Meteor.loginWithTwitter (e) ->
+    if e? then errCallback e
+    else
+      Router.go 'notes'
+      swal 'Ok', 'Logged In', 'success'
 Template.reconnect.time = ->
   tick.depend()
   if Meteor.status().retryTime
@@ -134,7 +149,7 @@ Template.menu.events
   'click .go-archive': -> Router.go 'archive'
 
 # Account Page
-Template.account.dateformat = -> getUser().dateformat
+Template.account.dateformat = -> if getUser() then return getUser().dateformat
 Template.account.events
   'click #reset-settings': (e,t) ->
     t.find('#set-date-format').value = "MM/DD/YYYY"
@@ -211,34 +226,14 @@ Template.editor.events
     t.find('.date').value = moment().add(1,'days').format(getUser().dateformat)
   'keypress .title': (e,t) -> saveCurrentNote t, e
 
-# Notifications (not used yet)
-alerts = []
-alertDep = new Deps.Dependency
-# Show a notification
-notify = (data) ->
-  alerts.push
-    title: data.title
-    msg: data.msg
-    type: data.type or "danger"
-  alertDep.changed()
-# Clear all notifications
-clearNotifications = -> alerts.clear(); alertDep.changed()
-# Get all the notifications
-Template.notifications.notification = -> alertDep.depend(); alerts
-Template.notifications.events
-  'click .close-notification': (e,template) ->
-    alerts.splice alerts.indexOf(this), 1
-    alertDep.changed()
-
 # "Error" visualization template
-errorDep = new Deps.Dependency; shownError = undefined
 showError = (err) ->
-  if err?
-    shownError = err; shownError.type = err.type or "danger"
-  else shownError = undefined
-  errorDep.changed()
-Template.error.error = -> errorDep.depend(); shownError
-Template.error.events 'click .close': -> showError()
+  return unless err?
+  type = err.type or 'error'
+  if !err.title?
+    title = if type is 'error' then 'Error' else 'Ok'
+  else title = err.title
+  swal title, err.msg, type
 
 # Verify Email page
 Template.verifyEmail.token = -> Router.current().params.token

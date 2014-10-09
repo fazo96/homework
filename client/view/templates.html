@@ -17,8 +17,8 @@
 </template>
 
 <!-- /notes and /archive -->
-<template name="notes">{{> error }} {{> editor }} {{> notelist }} {{> menu}}</template>
-<template name="archive">{{> error}} {{> archivedlist }} {{> menu }}</template>
+<template name="notes">{{> editor }} {{> notelist }} {{> menu}}</template>
+<template name="archive"> {{> archivedlist }} {{> menu }}</template>
 
 <!-- Note Adder -->
 <template name="noteadder">
@@ -104,7 +104,6 @@
 <template name="login">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-sign-in fa-2x"></i><br>Sign In</h3>
-    {{> error}}
     {{#if loading}}
       {{> loading}}
     {{else}}
@@ -130,7 +129,6 @@
       {{> loading}}
     {{else}}
       <p>Password must be at least 8 characters. You will need to confirm your email.</p>
-      {{> error}}
       <input type="text" id="r-mail" class="form-control register in-bt" placeholder="Email">
       <input type="password" id="r-pass" class="form-control register in-bt" placeholder="Password">
       <input type="password" id="r-pass-2" class="form-control register pass-rep in-bt" placeholder="Repeat Password">
@@ -146,7 +144,6 @@
 <template name="account">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-user fa-2x"></i><br>{{email}}</h3>
-    {{> error}}
     <p class="lead">Settings</p>
     <p>You can choose the format used to write and read dates in the note list</p>
     <input type="text" class="form-control" id="set-date-format" placeholder="Date Format" value="{{dateformat}}">
@@ -174,7 +171,6 @@
     <h3 class="cool-header"><i class="fa fa-envelope fa-2x"></i><br>
       Please verify your Email Address<br><small>{{email}}</small></h3>
     <p>Click the link inside the email we sent you or paste it here:</p>
-    {{> error}}
     <input type="text" id="token-field" class="form-control" placeholder="Token" value="{{token}}">
     <div align="center" class="btn-group">
       <button type="button" class="btn btn-warning btn-ver" id="btn-resend">
@@ -187,26 +183,6 @@
     <button type="button" class="btn btn-primary btn-ver" id="btn-logout">
       <i class="fa fa-sign-out"></i> Sign Out</button>
   </div>
-</template>
-
-<!-- Notification list. It doesn't show anything unless there are notifications -->
-<template name="notifications">
-  {{#each notification}}
-    <div class="alert alert-{{type}} notification">
-      <p align="center">{{msg}}</p>
-      <button type="button" class="close close-notification">&times;</button>
-    </div>
-  {{/each}}
-</template>
-
-<!-- Shows an Error if there is one. It's dismissable -->
-<template name="error">
-  {{#if error}}
-    <div align="center"><div class="alert alert-{{error.type}} error">
-      <p align="center">{{error.msg}}</p>
-      <button type="button" class="close close-error">&times;</button>
-    </div></div>
-  {{/if}}
 </template>
 
 <!-- Shows the "fork me on github" ribbon -->
@@ -282,6 +258,9 @@
   </div>
   {{#unless loading}}
   <div align="center" style="margin-top:20px;">
+    <a id="twitter" class="btn btn-primary">
+      <i class="fa fa-twitter"></i> Log In with Twitter
+    </a><br>
     <a href="{{pathFor 'login'}}" role="button" class="btn btn-primary">
       <i class="fa fa-sign-in"></i> Sign In
     </a>
