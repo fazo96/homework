@@ -24,6 +24,19 @@ In the mails sent by Homework, the website links point to the `ROOT_URL`
 environment variable as
 [explained on the Meteor docs](http://docs.meteor.com/#meteor_absoluteurl).
 
+#### Twitter Authentication
+
+Create this file: `server/settings.coffee` with this content:
+
+```coffeescript
+Meteor.startup ->
+  Accounts.loginServiceConfiguration.remove service : 'twitter'
+  Accounts.loginServiceConfiguration.insert
+    service: 'twitter'
+    consumerKey: 'Your API key'
+    secret: 'Your API secret'
+```
+
 ### License
 The MIT License (MIT)
 

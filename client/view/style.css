@@ -5,6 +5,10 @@ input {
   max-width: 400px;
 }
 
+#twitter {
+  margin-bottom: 1em;
+}
+
 .page-header {
   text-align: center;
 }

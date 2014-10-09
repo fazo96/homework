@@ -11,4 +11,7 @@ accounts-password
 iron:router
 mrt:moment
 mizzao:bootstrap-3
+spiderable
+kevohagan:sweetalert
+accounts-twitter
 

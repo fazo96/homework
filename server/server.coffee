@@ -13,9 +13,11 @@ isUsers = (u,doc) -> u and doc.userId is u
 # Returns true if the user has verified at least one email address
 userValidated = (user) ->
   return no unless user?
+  return yes if user.services.twitter
   return yes for mail in user.emails when mail.verified is yes; no
 
-Meteor.publish 'user', -> Meteor.users.find @userId, fields: dateformat: 1
+Meteor.publish 'user', ->
+  Meteor.users.find @userId, fields: {dateformat: 1, username: 1}
 # Publish user's notes to each user.
 Meteor.publish "my-notes", ->
   if userValidated getUser(@userId)
@@ -26,6 +28,8 @@ Meteor.publish "archive", ->
 
 # Custom new account default settings
 Accounts.onCreateUser (options, user) ->
+  console.log options
+  console.log user
   user.dateformat = options.dateformat or "MM/DD/YYYY"
   return user
 
