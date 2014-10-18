@@ -28,8 +28,6 @@ Meteor.publish "archive", ->
 
 # Custom new account default settings
 Accounts.onCreateUser (options, user) ->
-  console.log options
-  console.log user
   user.dateformat = options.dateformat or "MM/DD/YYYY"
   return user
 
