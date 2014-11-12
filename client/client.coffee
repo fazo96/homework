@@ -1,7 +1,7 @@
 # Homework - Client Side
-version = "1.1.6"
+version = "1.1.7"
 # Utilities
-tick = new Deps.Dependency()
+tick = new Tracker.Dependency()
 Meteor.setInterval (-> tick.changed();), 15000
 
 notes = new Meteor.Collection "notes"
@@ -62,7 +62,6 @@ loggedInController = RouteController.extend
       @render 'loading'
     else @render()
   onBeforeAction: ->
-    showError()
     if not getUser() then Router.go 'home'
     else if not amIValid() then Router.go 'verifyEmail'
     @next()
@@ -73,56 +72,57 @@ guestController = RouteController.extend
       @render 'reconnect'
     else @render()
   onBeforeAction: ->
-    showError()
     if getUser()
       if amIValid() is no then Router.go 'verifyEmail' else Router.go 'notes'
     @next()
 
 
-Router.map ->
-  @route 'home',
-    path: '/'
-    template: 'homepage'
-    action: -> @render 'homepage', to: 'outside'
-    onBeforeAction: ->
-      # Dispatch user to the right landing page based on his account status
-      if getUser()
-        if amIValid() is yes then Router.go 'notes' else Router.go 'verifyEmail'
-      @next()
-  @route 'login', controller: guestController
-  @route 'register', controller: guestController
-  @route 'account', controller: loggedInController
-  @route 'notes',
-    path: '/notes/:_id?'
-    waitOn: -> Meteor.subscribe 'my-notes'
-    data: -> notes.findOne _id: @params._id
-    controller: loggedInController
-  @route 'archive',
-    path: '/archive/:_id?'
-    waitOn: -> @notes = Meteor.subscribe 'archive'
-    onStop: -> @notes.stop()
-    controller: loggedInController
-  @route 'verifyEmail',
-    path: '/verify/:token?'
-    template: 'verifyEmail'
-    action: ->
-      if Meteor.status().connected is no
-        @render 'reconnect'
-      else @render()
-    onBeforeAction: ->
-      if getUser()
-        if amIValid() then Router.go 'home'
-      else Router.go 'home'
-      # Automatic verification
-      if @params.token? and @params.token isnt ""
-        @render 'loading'
-        Accounts.verifyEmail @params.token, (err) ->
-          if err
-            errCallback err; Router.go 'verifyEmail', token: @params.token
-          else
-            showErr type:'success', msg:'Verification complete'
-            Router.go 'home'
-  @route '404', path: '*'
+
+Router.route '/',
+  name: 'home'
+  template: 'homepage'
+  action: -> @render 'homepage', to: 'outside'
+  onBeforeAction: ->
+    # Dispatch user to the right landing page based on his account status
+    if getUser()
+      if amIValid() is yes then Router.go 'notes' else Router.go 'verifyEmail'
+    @next()
+Router.route '/login', controller: guestController
+Router.route '/register', controller: guestController
+Router.route '/account', controller: loggedInController
+Router.route '/notes/:_id?',
+  name: 'notes'
+  waitOn: -> Meteor.subscribe 'my-notes'
+  data: -> notes.findOne _id: @params._id
+  controller: loggedInController
+Router.route '/archive/:_id?',
+  name: 'archive'
+  waitOn: -> @notes = Meteor.subscribe 'archive'
+  onStop: -> @notes.stop()
+  controller: loggedInController
+Router.route '/verify/:token?',
+  name: 'verifyEmail'
+  template: 'verifyEmail'
+  action: ->
+    if Meteor.status().connected is no
+      @render 'reconnect'
+    else @render()
+  onBeforeAction: ->
+    if getUser()
+      if amIValid() then Router.go 'home'
+    else Router.go 'home'
+    # Automatic verification
+    if @params.token? and @params.token isnt ""
+      @render 'loading'
+      Accounts.verifyEmail @params.token, (err) =>
+        if err
+          errCallback err; Router.go 'verifyEmail', token: @params.token
+        else
+          showErr type:'success', msg:'Verification complete'
+          Router.go 'home'
+        @next()
+    else @next()
+Router.route '/(.*)', -> @render '404'
 
 # Client Templates
 
@@ -140,10 +140,11 @@ Template.homepage.events
     else
       Router.go 'notes'
       swal 'Ok', 'Logged In', 'success'
-Template.reconnect.time = ->
-  tick.depend()
-  if Meteor.status().retryTime
-    '(retrying '+moment(Meteor.status().retryTime).fromNow()+')'
+Template.reconnect.helpers
+  time : ->
+    tick.depend()
+    if Meteor.status().retryTime
+      '(retrying '+moment(Meteor.status().retryTime).fromNow()+')'
 
 # 3 Buttons navigation Menu
 Template.menu.events
@@ -152,7 +153,8 @@ Template.menu.events
   'click .go-archive': -> Router.go 'archive'
 
 # Account Page
-Template.account.dateformat = -> if getUser() then return getUser().dateformat
+Template.account.helpers
+  dateformat: -> if getUser() then return getUser().dateformat
 Template.account.events
   'click #reset-settings': (e,t) ->
     t.find('#set-date-format').value = "MM/DD/YYYY"
@@ -164,11 +166,7 @@ Template.account.events
   'click #btn-delete-me': -> deleteAccount()
 
 # Notes list
-Template.notelist.active = ->
-  return no unless Router.current() and Router.current().data()
-  return @_id is Router.current().data()._id
-Template.notelist.empty = -> Template.notelist.notelist().length is 0
-Template.notelist.getDate = ->
+formattedDate = ->
   return unless @date
   tick.depend()
   #dif = moment(@date, getUser().dateformat).diff(moment(), 'days')
@@ -178,8 +176,15 @@ Template.notelist.getDate = ->
   color = "warning" if dif is 1
   color = "danger" if dif < 1
   msg: moment.unix(@date).fromNow(), color: color
-Template.notelist.notelist = ->
-  notes.find({ archived: no },{ sort: date: 1}).fetch()
+notelist = -> notes.find({ archived: no },{ sort: date: 1})
+Template.notelist.helpers
+  notelist: -> notelist().fetch()
+  active: ->
+    return no unless Router.current() and Router.current().data()
+    return @_id is Router.current().data()._id
+  empty: -> notelist().count() is 0
+  getDate: formattedDate
+
 Template.notelist.events
   'click .close-note': -> notes.update @_id, $set: archived: yes
   'click .edit-note': -> Router.go 'notes'
@@ -191,22 +196,24 @@ Template.notelist.events
       template.find('#newNote').value = ""
 
 # Archive
-Template.archivedlist.empty = -> Template.archivedlist.archived().length is 0
-Template.archivedlist.getDate = Template.notelist.getDate
-Template.archivedlist.archived = ->
-  notes.find({ archived: yes },{ sort: date: 1}).fetch()
-Template.archivedlist.events =
+archived = -> notes.find({ archived: yes },{ sort: date: 1})
+Template.archivedlist.helpers
+  empty: -> archived().count() is 0
+  getDate: formattedDate
+  archived: -> archived().fetch()
+Template.archivedlist.events
   'click .close-note': -> notes.remove @_id
   'click .note': -> notes.update @_id, $set: archived: no
   'click .clear': ->
     notes.remove item._id for item in Template.archivedlist.archived()
 
 # Note Editor
-Template.editor.note = -> Router.current().data()
-Template.editor.dateformat = -> getUser().dateformat
-Template.editor.formattedDate = ->
-  return unless @date
-  moment.unix(@date).format(getUser().dateformat)
+Template.editor.helpers
+  note: -> Router.current().data()
+  dateformat: -> getUser().dateformat
+  formattedDate: ->
+    return unless @date
+    moment.unix(@date).format(getUser().dateformat)
 saveCurrentNote = (t,e) ->
   if e and e.keyCode isnt 13 then return
   dat = no
@@ -239,7 +246,8 @@ showError = (err) ->
   swal title, err.msg, type
 
 # Verify Email page
-Template.verifyEmail.token = -> Router.current().params.token
+Template.verifyEmail.helpers
+  token: -> Router.current().params.token
 Template.verifyEmail.events
   'click #btn-verify': (e,template) ->
     t = template.find('#token-field').value; t = t.split("/")
@@ -286,6 +294,7 @@ registerRequest = (e,template) ->
       }, (err) -> if err then errCallback err else Router.go 'confirmEmail'
     catch err
       showError msg: err
+
 Template.register.events
   'click #register-btn': (e,t) -> registerRequest null,t
   'keypress .register': (e,t) -> registerRequest e,t
