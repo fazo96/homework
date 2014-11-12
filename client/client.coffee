@@ -65,6 +65,7 @@ loggedInController = RouteController.extend
     showError()
     if not getUser() then Router.go 'home'
     else if not amIValid() then Router.go 'verifyEmail'
+    @next()
 
 guestController = RouteController.extend
   action: ->
@@ -75,6 +76,7 @@ guestController = RouteController.extend
     showError()
     if getUser()
       if amIValid() is no then Router.go 'verifyEmail' else Router.go 'notes'
+    @next()
 
 
 Router.map ->
@@ -86,6 +88,7 @@ Router.map ->
       # Dispatch user to the right landing page based on his account status
       if getUser()
         if amIValid() is yes then Router.go 'notes' else Router.go 'verifyEmail'
+      @next()
   @route 'login', controller: guestController
   @route 'register', controller: guestController
   @route 'account', controller: loggedInController
