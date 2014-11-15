@@ -153,6 +153,10 @@ input {
   margin-right: 10px
 }
 
+.paginator {
+  margin-bottom: 1em;
+}
+
 /* IDs */
 
 #ui-container {

@@ -1,10 +1,10 @@
 # Homework - Client Side
-version = "1.1.7"
+version = "1.1.8"
 # Utilities
 tick = new Tracker.Dependency()
 Meteor.setInterval (-> tick.changed();), 15000
 
-notes = new Meteor.Collection "notes"
+notes = new Meteor.Collection 'notes'
 userSub = Meteor.subscribe 'user'
 getUser = -> Meteor.user()
 deleteAccount = ->
@@ -76,8 +76,7 @@ guestController = RouteController.extend
       if amIValid() is no then Router.go 'verifyEmail' else Router.go 'notes'
     @next()
 
-
-
+# Page Routing
 Router.route '/',
   name: 'home'
   template: 'homepage'
@@ -92,13 +91,8 @@ Router.route '/register', controller: guestController
 Router.route '/account', controller: loggedInController
 Router.route '/notes/:_id?',
   name: 'notes'
-  waitOn: -> Meteor.subscribe 'my-notes'
+  waitOn: -> Meteor.subscribe 'notes', no
   data: -> notes.findOne _id: @params._id
-  controller: loggedInController
-Router.route '/archive/:_id?',
-  name: 'archive'
-  waitOn: -> @notes = Meteor.subscribe 'archive'
-  onStop: -> @notes.stop()
   controller: loggedInController
 Router.route '/verify/:token?',
   name: 'verifyEmail'
@@ -109,20 +103,26 @@ Router.route '/verify/:token?',
     else @render()
   onBeforeAction: ->
     if getUser()
-      if amIValid() then Router.go 'home'
-    else Router.go 'home'
-    # Automatic verification
-    if @params.token? and @params.token isnt ""
-      @render 'loading'
-      Accounts.verifyEmail @params.token, (err) =>
-        if err
-          errCallback err; Router.go 'verifyEmail', token: @params.token
-        else
-          showErr type:'success', msg:'Verification complete'
-          Router.go 'home'
-        @next()
-    else @next()
-Router.route '/(.*)', -> @render '404'
+      if amIValid()
+        Router.go 'home'; @next()
+      else if @params.token? and @params.token isnt ""
+        # Automatic verification
+        @render 'loading'
+        Accounts.verifyEmail @params.token, (err) =>
+          if err
+            errCallback err; Router.go 'verifyEmail', token: @params.token
+          else
+            showErr type:'success', msg:'Verification complete'
+            Router.go 'home'
+          @next()
+    else
+      Router.go 'home'; @next()
+Router.route '/archive/:_id?',
+  name: 'archive'
+  waitOn: -> @notes = Meteor.subscribe 'notes', yes
+  onStop: -> @notes.stop()
+  controller: loggedInController
+Router.route '/(.*)', -> @render '404' # Catch-all route
 
 # Client Templates
 
@@ -176,7 +176,13 @@ formattedDate = ->
   color = "warning" if dif is 1
   color = "danger" if dif < 1
   msg: moment.unix(@date).fromNow(), color: color
-notelist = -> notes.find({ archived: no },{ sort: date: 1})
+notePaginator = new Paginator(10)
+notelist = ->
+  notePaginator.calibrate(notes.find(archived: no).count())
+  opt = notePaginator.queryOptions()
+  notes.find({ archived: no },{
+    sort: {date: 1}, skip: opt.skip, limit: opt.limit
+  })
 Template.notelist.helpers
   notelist: -> notelist().fetch()
   active: ->
@@ -184,6 +190,8 @@ Template.notelist.helpers
     return @_id is Router.current().data()._id
   empty: -> notelist().count() is 0
   getDate: formattedDate
+  paginator: -> notePaginator
+  pageActive: -> if @active then "btn-primary" else "btn-default"
 
 Template.notelist.events
   'click .close-note': -> notes.update @_id, $set: archived: yes
@@ -194,18 +202,28 @@ Template.notelist.events
         title: template.find('#newNote').value
         content: "", date: no, archived: no, userId: Meteor.userId()
       template.find('#newNote').value = ""
+  'click .btn': -> notePaginator.page @index
 
 # Archive
-archived = -> notes.find({ archived: yes },{ sort: date: 1})
+archivePaginator = new Paginator(10)
+archived = ->
+  archivePaginator.calibrate(notes.find(archived: yes).count())
+  opt = archivePaginator.queryOptions()
+  notes.find({archived: yes},{
+    sort: {date: 1}, limit: opt.limit, skip: opt.skip
+  })
 Template.archivedlist.helpers
   empty: -> archived().count() is 0
   getDate: formattedDate
   archived: -> archived().fetch()
+  paginator: -> archivePaginator
+  pageActive: -> if @active then "btn-primary" else "btn-default"
 Template.archivedlist.events
   'click .close-note': -> notes.remove @_id
   'click .note': -> notes.update @_id, $set: archived: no
   'click .clear': ->
     notes.remove item._id for item in Template.archivedlist.archived()
+  'click .btn': (e) -> archivePaginator.page @index
 
 # Note Editor
 Template.editor.helpers

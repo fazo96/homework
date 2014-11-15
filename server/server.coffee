@@ -19,12 +19,9 @@ userValidated = (user) ->
 Meteor.publish 'user', ->
   Meteor.users.find @userId, fields: {dateformat: 1, username: 1}
 # Publish user's notes to each user.
-Meteor.publish "my-notes", ->
+Meteor.publish "notes", (archived) ->
   if userValidated getUser(@userId)
-    notes.find userId: @userId, archived: no
-Meteor.publish "archive", ->
-  if userValidated getUser(@userId)
-    notes.find userId: @userId, archived: yes
+    notes.find userId: @userId, archived: archived
 
 # Custom new account default settings
 Accounts.onCreateUser (options, user) ->

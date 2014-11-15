@@ -43,6 +43,13 @@
     </a>
     {{/each}}
   </div>
+  {{#if paginator.show}}
+    <div align="center"><div class="btn-group paginator">
+    {{#each paginator.pages}}
+      <button type="button" class="btn {{pageActive}}">{{index}}</button>
+    {{/each}}
+  </div></div>
+  {{/if}}
   {{#if empty}}
     <p class="lead" align="center">You don't have any notes, try adding a new one!</p>
   {{/if}}
@@ -67,6 +74,13 @@
     </a>
     {{/each}}
   </div>
+  {{#if paginator.show}}
+    <div align="center"><div class="btn-group paginator">
+    {{#each paginator.pages}}
+      <button type="button" class="btn {{pageActive}}">{{index}}</button>
+    {{/each}}
+  </div></div>
+  {{/if}}
   {{#if empty}}
     <p class="lead" align="center">Your archive is empty</p>
   {{else}}
