@@ -2,6 +2,8 @@ accounts-base@1.1.2
 accounts-oauth@1.1.2
 accounts-password@1.0.4
 accounts-twitter@1.0.2
+alanning:package-stubber@0.0.9
+amplify@1.0.0
 application-configuration@1.0.3
 autoupdate@1.1.3
 base64@1.0.1
@@ -38,6 +40,7 @@ jquery@1.0.1
 json@1.0.1
 kevohagan:sweetalert@0.3.1
 launch-screen@1.0.0
+less@1.0.11
 livedata@1.0.11
 localstorage@1.0.1
 logging@1.0.5
@@ -61,6 +64,11 @@ reactive-var@1.0.3
 reload@1.1.1
 retry@1.0.1
 routepolicy@1.0.2
+sanjo:jasmine@0.6.4
+sanjo:karma-chrome-launcher@0.1.5_1
+sanjo:karma-coffee-preprocessor@0.2.1
+sanjo:karma-jasmine@0.2.3
+sanjo:karma@0.12.24_2
 service-configuration@1.0.2
 session@1.0.4
 sha@1.0.1
@@ -75,5 +83,9 @@ twitter@1.1.2
 ui@1.0.4
 underscore@1.0.1
 url@1.0.2
+velocity:core@1.0.0-rc.5
+velocity:html-reporter@0.3.0
+velocity:meteor-stubs@1.0.0_2
+velocity:shim@0.0.2
 webapp-hashing@1.0.1
 webapp@1.1.4
