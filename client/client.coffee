@@ -77,7 +77,7 @@ guestController = RouteController.extend
     else @render()
   onBeforeAction: ->
     if getUser()
-      if amIValid() is no then @redirect 'verifyEmail' else Router.redirect 'notes'
+      if amIValid() is no then @redirect 'verifyEmail' else @redirect 'notes'
     @next()
 
 # Page Routing
@@ -91,7 +91,7 @@ Router.route '/',
   onBeforeAction: ->
     # Dispatch user to the right landing page based on his account status
     if getUser()
-      if amIValid() is yes then @redirect 'notes' else Router.redirect 'verifyEmail'
+      if amIValid() is yes then @redirect 'notes' else @redirect 'verifyEmail'
     @next()
 Router.route '/login', controller: guestController
 Router.route '/register', controller: guestController
@@ -107,7 +107,7 @@ Router.route '/verify/:token?',
   action: ->
     if Meteor.status().connected is no
       @render 'reconnect'
-    else @render()
+    else @render(); @render 'nothing', to: 'outside'
   onBeforeAction: ->
     if getUser()
       if amIValid()
@@ -123,6 +123,7 @@ Router.route '/verify/:token?',
             showErr type:'success', msg:'Verification complete'
             Router.go 'home'
           @next()
+      @next()
     else
       @redirect 'home'
       @next()
