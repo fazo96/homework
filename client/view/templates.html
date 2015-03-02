@@ -272,9 +272,16 @@
   </div>
   {{#unless loading}}
   <div align="center" style="margin-top:20px;">
+    {{#if twitterAvailable}}
     <a id="twitter" class="btn btn-primary">
       <i class="fa fa-twitter"></i> Log In with Twitter
     </a><br>
+    {{/if}}
+    {{#if facebookAvailable}}
+    <a id="facebook" class="btn btn-primary">
+      <i class="fa fa-facebook"></i> Log In with Facebook
+    </a><br>
+    {{/if}}
     <a href="{{pathFor 'login'}}" role="button" class="btn btn-primary">
       <i class="fa fa-sign-in"></i> Sign In
     </a>

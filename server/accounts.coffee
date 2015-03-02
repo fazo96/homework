@@ -10,10 +10,33 @@ Accounts.config {
   loginExpirationInDays: 30
 }
 
+# Login via external services
+
+if Meteor.settings.facebook
+  ServiceConfiguration.configurations.upsert { service: "facebook" }, $set: {
+    service: "facebook"
+    appId: Meteor.settings.facebook.appId
+    #loginStyle: "popup"
+    secret: Meteor.settings.facebook.secret
+  }
+else ServiceConfiguration.configurations.remove { service: "facebook" }
+
+if Meteor.settings.twitter
+  ServiceConfiguration.configurations.upsert { service: "twitter" }, $set: {
+    service: "twitter"
+    consumerKey: Meteor.settings.twitter.consumerKey
+    #loginStyle: "popup"
+    secret: Meteor.settings.twitter.secret
+  }
+else ServiceConfiguration.configurations.remove { service: "twitter" }
+
 # Code that checks if a new user request is valid
 Accounts.validateNewUser (user) ->
   if user.services.twitter?
     user.username = user.services.twitter.screenName
+    return yes
+  if user.services.facebook?
+    user.username = user.services.facebook.name
     return yes
   mail = user.emails[0].address
   if Match.test(mail,String) is no or validateEmail(mail) is no

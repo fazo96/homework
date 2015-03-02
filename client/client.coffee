@@ -1,5 +1,5 @@
 # Homework - Client Side
-version = "1.1.8"
+version = "1.2"
 # Utilities
 tick = new Tracker.Dependency()
 Meteor.setInterval (-> tick.changed();), 15000
@@ -25,6 +25,10 @@ amIValid = ->
 UI.registerHelper "version", -> version
 UI.registerHelper "status", -> Meteor.status()
 UI.registerHelper "loading", -> Meteor.loggingIn() or !Meteor.status().connected
+UI.registerHelper "facebookAvailable", ->
+  Accounts.loginServicesConfigured() and ServiceConfiguration.configurations.find(service: "facebook").count() > 0
+UI.registerHelper "twitterAvailable", ->
+  Accounts.loginServicesConfigured() and ServiceConfiguration.configurations.find(service: "twitter").count() > 0
 UI.registerHelper "email", ->
   if getUser()
     if getUser().username then return getUser().username
@@ -62,8 +66,8 @@ loggedInController = RouteController.extend
       @render 'loading'
     else @render()
   onBeforeAction: ->
-    if not getUser() then Router.go 'home'
-    else if not amIValid() then Router.go 'verifyEmail'
+    if not getUser() then Router.redirect 'home'
+    else if not amIValid() then Router.redirect 'verifyEmail'
     @next()
 
 guestController = RouteController.extend
@@ -73,7 +77,7 @@ guestController = RouteController.extend
     else @render()
   onBeforeAction: ->
     if getUser()
-      if amIValid() is no then Router.go 'verifyEmail' else Router.go 'notes'
+      if amIValid() is no then Router.redirect 'verifyEmail' else Router.redirect 'notes'
     @next()
 
 # Page Routing
@@ -84,7 +88,7 @@ Router.route '/',
   onBeforeAction: ->
     # Dispatch user to the right landing page based on his account status
     if getUser()
-      if amIValid() is yes then Router.go 'notes' else Router.go 'verifyEmail'
+      if amIValid() is yes then Router.redirect 'notes' else Router.redirect 'verifyEmail'
     @next()
 Router.route '/login', controller: guestController
 Router.route '/register', controller: guestController
@@ -104,7 +108,8 @@ Router.route '/verify/:token?',
   onBeforeAction: ->
     if getUser()
       if amIValid()
-        Router.go 'home'; @next()
+        Router.redirect 'home'
+        @next()
       else if @params.token? and @params.token isnt ""
         # Automatic verification
         @render 'loading'
@@ -116,7 +121,8 @@ Router.route '/verify/:token?',
             Router.go 'home'
           @next()
     else
-      Router.go 'home'; @next()
+      Router.redirect 'home'
+      @next()
 Router.route '/archive/:_id?',
   name: 'archive'
   waitOn: -> @notes = Meteor.subscribe 'notes', yes
@@ -132,14 +138,18 @@ logoutCallback = (err) ->
 errCallback = (err) ->
   if err.reason
     showError msg: err.reason
-  else showErrror msg: err
+  else showError msg: err
+
+loginCallback = (e) ->
+  if e? then errCallback e
+  else
+    Router.go 'notes'
+    swal 'Ok', 'Logged In', 'success'
 
 Template.homepage.events
-  'click #twitter': -> Meteor.loginWithTwitter (e) ->
-    if e? then errCallback e
-    else
-      Router.go 'notes'
-      swal 'Ok', 'Logged In', 'success'
+  'click #facebook': -> Meteor.loginWithFacebook loginCallback
+  'click #twitter': -> Meteor.loginWithTwitter loginCallback
+
 Template.reconnect.helpers
   time : ->
     tick.depend()

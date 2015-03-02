@@ -13,7 +13,7 @@ isUsers = (u,doc) -> u and doc.userId is u
 # Returns true if the user has verified at least one email address
 userValidated = (user) ->
   return no unless user?
-  return yes if user.services.twitter
+  return yes if user.services.twitter or user.services.facebook
   return yes for mail in user.emails when mail.verified is yes; no
 
 Meteor.publish 'user', ->
