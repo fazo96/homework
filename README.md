@@ -28,18 +28,29 @@ You'll probably also need [phantomjs](http://phantomjs.org/) installed
 since the apps now depends on Meteor's
 [spiderable](http://docs.meteor.com/#spiderable) package.
 
-#### Twitter Authentication
+#### Twitter and/or Facebook Authentication
 
-Create this file: `server/settings.coffee` with this content:
+Create a `.json` file with this content:
 
-```coffeescript
-Meteor.startup ->
-  Accounts.loginServiceConfiguration.remove service : 'twitter'
-  Accounts.loginServiceConfiguration.insert
-    service: 'twitter'
-    consumerKey: 'Your API key'
-    secret: 'Your API secret'
+```json
+{
+  "facebook": {
+    "appId": "your_facebook_app_id",
+    "secret": "your_facebook_app_secret"
+  },
+  "twitter": {
+    "consumerKey": "your_twitter_app_token",
+    "secret": "your_facebook_app_secret"
+  }
+}
 ```
+
+Then run or deploy your application using the `meteor` argument `--settings`
+followed by a space and the path to your json file.
+
+__Example:__ `meteor --settings file.json` or `meteor deploy homework --settings file.json`
+
+The application will automatically adapt and show login buttons as needed.
 
 ### License
 The MIT License (MIT)
