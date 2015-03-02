@@ -66,8 +66,8 @@ loggedInController = RouteController.extend
       @render 'loading'
     else @render()
   onBeforeAction: ->
-    if not getUser() then Router.redirect 'home'
-    else if not amIValid() then Router.redirect 'verifyEmail'
+    if not getUser() then @redirect 'home'
+    else if not amIValid() then @redirect 'verifyEmail'
     @next()
 
 guestController = RouteController.extend
@@ -77,18 +77,21 @@ guestController = RouteController.extend
     else @render()
   onBeforeAction: ->
     if getUser()
-      if amIValid() is no then Router.redirect 'verifyEmail' else Router.redirect 'notes'
+      if amIValid() is no then @redirect 'verifyEmail' else Router.redirect 'notes'
     @next()
 
 # Page Routing
 Router.route '/',
   name: 'home'
   template: 'homepage'
-  action: -> @render 'homepage', to: 'outside'
+  action: ->
+    @render 'homepage', to: 'outside'
+    # Iron Router Workaround for a bug where content from previous renderings carries over if not overwritten
+    @render 'nothing'
   onBeforeAction: ->
     # Dispatch user to the right landing page based on his account status
     if getUser()
-      if amIValid() is yes then Router.redirect 'notes' else Router.redirect 'verifyEmail'
+      if amIValid() is yes then @redirect 'notes' else Router.redirect 'verifyEmail'
     @next()
 Router.route '/login', controller: guestController
 Router.route '/register', controller: guestController
@@ -108,7 +111,7 @@ Router.route '/verify/:token?',
   onBeforeAction: ->
     if getUser()
       if amIValid()
-        Router.redirect 'home'
+        @redirect 'home'
         @next()
       else if @params.token? and @params.token isnt ""
         # Automatic verification
@@ -121,7 +124,7 @@ Router.route '/verify/:token?',
             Router.go 'home'
           @next()
     else
-      Router.redirect 'home'
+      @redirect 'home'
       @next()
 Router.route '/archive/:_id?',
   name: 'archive'
