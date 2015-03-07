@@ -1,5 +1,5 @@
 # Homework - Client Side
-version = "1.2"
+version = "1.3"
 # Utilities
 tick = new Tracker.Dependency()
 Meteor.setInterval (-> tick.changed();), 15000
@@ -132,7 +132,6 @@ Router.route '/archive/:_id?',
   waitOn: -> @notes = Meteor.subscribe 'notes', yes
   onStop: -> @notes.stop()
   controller: loggedInController
-Router.route '/(.*)', -> @render '404' # Catch-all route
 
 # Client Templates
 

@@ -1,12 +1,11 @@
 # Homework - Server Side
-notes = share.notes
 console.log "Started Homework server!"
 if process.env.MAIL_URL
   console.log "Sending emails using "+process.env.MAIL_URL
 else
   console.log "Not Sending Emails, please set the MAIL_URL environment variable"
 
-notes = new Meteor.Collection "notes"
+notes = share.notes
 getUser = (id) -> Meteor.users.findOne { _id: id }
 isUsers = (u,doc) -> u and doc.userId is u
 
