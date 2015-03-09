@@ -4,13 +4,14 @@ if !Meteor.settings.enableAPI? then return
 
 console.log 'RESTful HTTP API enabled'
 
-apiKeyToUser = (key) -> Meteor.users.findOne apiKey: key
+apiKeyToUser = (key) ->
+  if key? and key != "" then Meteor.users.findOne apiKey: key
 respond = (res, code, obj) ->
   res.writeHead code, 'Content-Type': 'application/json'
   res.end JSON.stringify obj
 
-# GET NOTES
 Router.route '/api/:key', where: 'server'
+  # GET NOTES
   .get ->
     user = apiKeyToUser @params.key
     if !user

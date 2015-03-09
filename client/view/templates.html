@@ -161,9 +161,17 @@
 <template name="account">
   <div align="center">
     <h3 class="cool-header"><i class="fa fa-user fa-2x"></i><br>{{email}}</h3>
-    <p class="lead">Settings</p>
+    <p class="lead">Date Format</p>
     <p>You can choose the format used to write and read dates in the note list</p>
     <input type="text" class="form-control" id="set-date-format" placeholder="Date Format" value="{{dateformat}}">
+    <hr>
+    <p class="lead">API Key</p>
+    <p>If you want to be able to use our <b>RESTful API</b> or an application that uses it (such as our awesome
+    <a href="https://www.npmjs.com/package/homework-cli">command line client</a>) you need to input an <b>API Key</b>
+    here that will allow the programs to <u>read, write and delete all your notes</u>.</p>
+    <p>you can change this key any time
+    or remove it completely by leaving this field blank.</p>
+    <input type="text" class="form-control" id="set-api-key" placeholder="Your API Key" value="{{apikey}}">
     <div class="btn-group">
       <button type="button" id="save-settings" class="btn btn-primary">
         <i class="fa fa-upload"></i> Save</button>

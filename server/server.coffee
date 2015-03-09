@@ -16,7 +16,7 @@ userValidated = (user) ->
   return yes for mail in user.emails when mail.verified is yes; no
 
 Meteor.publish 'user', ->
-  Meteor.users.find @userId, fields: {dateformat: 1, username: 1}
+  Meteor.users.find @userId, fields: {dateformat: 1, username: 1, apiKey: 1}
 # Publish user's notes to each user.
 Meteor.publish "notes", (archived) ->
   if userValidated getUser(@userId)
@@ -57,7 +57,10 @@ Meteor.methods
 
 # Allow users to change their date format
 Meteor.users.allow
-  update: (id,doc,fields,mod) ->
-    if fields[0] == 'dateformat' and fields.length == 1
-      return yes
-    return no
+  update: (id,doc,fields,mod) -> 
+    for i,f of fields
+      console.log f
+      unless f in ['dateformat','apiKey']
+        return no
+    yes
+  fetch: ['dateformat','apiKey']

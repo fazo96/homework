@@ -168,12 +168,16 @@ Template.menu.events
 # Account Page
 Template.account.helpers
   dateformat: -> if getUser() then return getUser().dateformat
+  apikey: -> if getUser() then return getUser().apiKey
 Template.account.events
   'click #reset-settings': (e,t) ->
     t.find('#set-date-format').value = "MM/DD/YYYY"
+    t.find('#set-api-key').value = ''
   'click #save-settings': (e,t) ->
     Meteor.users.update getUser()._id,
-      $set: dateformat: t.find('#set-date-format').value
+      $set:
+        dateformat: t.find('#set-date-format').value
+        apiKey: t.find('#set-api-key').value
     showError msg: 'Settings saved', type: 'success'
   'click #btn-logout': -> Meteor.logout logoutCallback
   'click #btn-delete-me': -> deleteAccount()
