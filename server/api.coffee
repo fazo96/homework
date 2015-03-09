@@ -19,8 +19,26 @@ Router.route '/api/:key', where: 'server'
       respond @response, 200, notes.find(
         { userId: user._id, archived: no },
         { fields: { archived: 0, userId: 0 }, sort: { date: 1 }}).fetch()
+  # POST - inserts new note
+  .post ->
+    user = apiKeyToUser @params.key
+    if !user
+      respond @response, 400, error: 'invalid api key'
+    else
+      if @request.body.date? and @request.body.date isnt false
+        @request.body.date = moment(@request.body.date, @request.body.dateformat || user.dateformat).unix()
+      else @request.body.date = no
+      toInsert =
+        userId: user._id
+        title: @request.body.title
+        date: @request.body.date
+        content: @request.body.content || ""
+        archived: @request.body.archived || no
+      if @request.body.title? then notes.insert toInsert, (e,i) =>
+        respond @response, (if e then 500 else 200), if e then { error: e } else { inserted: i }
+      else respond @response, 400, { error: '"title" field required to insert note into database' }
 
-# GET ARCHIVE
+# GET archive
 Router.route '/api/:key/archived', where: 'server'
   .get ->
     user = apiKeyToUser @params.key
@@ -42,26 +60,13 @@ Router.route '/api/:key/backup', where: 'server'
 
 # RESTORE to be implemented
 
-# INSERT NOTE
-Router.route '/api/:key/:title/:desc', where: 'server'
-  .post ->
-    user = apiKeyToUser @params.key
-    if !user
-      respond @response, 400, error: 'invalid api key'
-    else
-      notes.insert {
-        userId: user._id
-        title: @params.title
-        content: @params.desc
-        date: no
-        archived: no
-      }, (e) => respond @response, (if e then 500 else 200), e or {}
-
-# DELETE NOTE
-Router.route '/api/:id', where: 'server'
+Router.route '/api/:key/:id', where: 'server'
+  # DELETE NOTE
   .delete ->
     user = apiKeyToUser @params.key
     if !user
       respond @response, 400, error: 'invalid api key'
     else
-      notes.remove @params.id, (e) => respond @response, (if e then 500 else 200), e or {}
+      notes.remove @params.id, (e,d) =>
+        if e then respond @response, 400, { error: e }
+        else respond @response, 200, { deleted: d }
