@@ -52,6 +52,18 @@ __Example:__ `meteor --settings file.json` or `meteor deploy homework --settings
 
 The application will automatically adapt and show login buttons as needed.
 
+#### RESTful API
+
+To enable the __RESTful API__ on your server, just add this to your `.json` settings file (as explained in the section above):
+
+```json
+"public": {
+  "enableAPI": true
+}
+```
+
+Your users will now be able to set API keys and use them, also enabling the use of the [Homework Command Line Client](http://github.com/fazo96/homework-cli).
+
 ### License
 The MIT License (MIT)
 

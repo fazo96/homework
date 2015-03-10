@@ -1,6 +1,6 @@
 notes = share.notes = new Mongo.Collection 'notes'
 
-if !Meteor.settings.enableAPI? then return
+if !Meteor.settings.public?.enableAPI? then return
 
 console.log 'RESTful HTTP API enabled'
 

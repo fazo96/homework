@@ -25,6 +25,7 @@ amIValid = ->
 UI.registerHelper "version", -> version
 UI.registerHelper "status", -> Meteor.status()
 UI.registerHelper "loading", -> Meteor.loggingIn() or !Meteor.status().connected
+UI.registerHelper "APIAvailable", -> Meteor.settings.public?.enableAPI?
 UI.registerHelper "facebookAvailable", ->
   Accounts.loginServicesConfigured() and ServiceConfiguration.configurations.find(service: "facebook").count() > 0
 UI.registerHelper "twitterAvailable", ->
